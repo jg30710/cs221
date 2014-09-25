@@ -1,2 +1,6 @@
 # vim cruft
 *.swp
+
+# grader output
+code/*.out
+code/*.pyc
