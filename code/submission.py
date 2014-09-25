@@ -14,8 +14,6 @@ def computeMaxWordLength(text):
 	return max(text.split(" "), key=lambda x : len(x))
 	# END_YOUR_CODE
 
-#print computeMaxWordLength("The quick brown fox jumped over the lazy dogs")
-
 ############################################################
 # Problem 3b
 
@@ -42,8 +40,6 @@ def manhattanDistance(loc1, loc2):
 	return abs(loc1[0] - loc2[0]) + abs(loc1[1] - loc2[1])
 	# END_YOUR_CODE
 
-#print manhattanDistance((1,2), (5,16))
-
 ############################################################
 # Problem 3d
 
@@ -56,19 +52,19 @@ def sparseVectorDotProduct(v1, v2):
 	# BEGIN_YOUR_CODE (around 4 lines of code expected)
 	components = set(v1.keys()) | set(v2.keys())
 	return sum([v1[component] * v2[component] for component in components])
-	raise Exception("Not implemented yet")
 	# END_YOUR_CODE
 
 ############################################################
 # Problem 3e
 
 def incrementSparseVector(v1, scale, v2):
-    """
-    Given two sparse vectors |v1| and |v2|, perform v1 += scale * v2.
-    """
-    # BEGIN_YOUR_CODE (around 2 lines of code expected)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+	"""
+		Given two sparse vectors |v1| and |v2|, perform v1 += scale * v2.
+	"""
+	# BEGIN_YOUR_CODE (around 2 lines of code expected)
+	for component in v2: v2[component] *= scale
+	return v1.update(v2)
+	# END_YOUR_CODE
 
 ############################################################
 # Problem 3f
@@ -82,7 +78,11 @@ def computeMostFrequentWord(text):
 		You might find it useful to use collections.Counter().
 	"""
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	raise Exception("Not implemented yet")
+	textCounter = collections.Counter(text.split(" "))
+	mostCommonTuple = textCounter.most_common(1)[0]
+	count = mostCommonTuple[1]
+	ties = set([tie[0] for tie in textCounter.most_common() if tie[1] >= count])
+	return (ties, len(ties))
 	# END_YOUR_CODE
 
 ############################################################
