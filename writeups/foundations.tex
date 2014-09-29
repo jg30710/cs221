@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 1}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 1}
+
+\begin{enumerate}[label=(\alph*)]
+  \item In order to minimize the function
+  \(f(x) = \frac{1}{2}\sum_{i=1}^{n}w_i(x-b_i)^2\)
+	we must establish the derivative which is:
+  \[f'(x) = \sum_{i=1}^{n}w_i(x-b_i)\]
+  and solve for when it is equal to zero since the minimum is characterized
+  by the tangent of zero slope for quadratic functions. Choosing
+  an \(x\) such that the summation in the derivative is as close to zero as
+  possible means that the quantity \((x-b_i)\) must be either as close to
+  zero as possible or cause terms to sum to zero
+  (e.g. \((x-b_m) + (x-b_n) \approx 0\))
+  which can be achieved by choosing
+  \(x\) to be the mean of the \(b_i\) terms.
+
+  \item The relationship between the functions:
+  \[
+		f(x)=\text{max}_{a\in\{1,-1\}}\sum_{j=1}^dax_j
+		\text{ and }
+		g(x)=\sum_{j=1}^d\text{max}_{a\in\{1,-1\}}ax_j
+	\]
+  is that \(f(x) \leq g(x)\). The function \(f(x)\) computes the max
+  of two sums, one in which all \(a\) are positive and the other when
+  all \(a\) are negative over the sum.
+  The function \(g(x)\) on the other hand
+  computes the max on every term of the sum,
+	\(\text{max}(\{x_j, -x_j\})\),
+  which will yield a positive number for every term in the sum
+  despite the sign on \(x\). Since the
+  sum in \(f(x)\) is a sum of positive and negative numbers it will be
+  smaller than \(g(x)\), a sum of all positive terms, unless all \(x\)
+  are positive in which case \(f(x)\) and \(g(x)\) will be equal.
+
+  \item For \(n\) rolls of a fair, six-sided dice, the expected value of the
+  counter tracking dots \(d\geq4\) can be expressed by \(E = p(d\geq4)n\).
+  The value of \(p(d\geq4)\) is \(\frac{1}{2}\) since there are 3 of 6 sides where
+  \(d\geq4\). Thus the expected value, E, is \(\frac{n}{2}\). The dice
+  rolls \textit{must} be independent to calculate the expected
+  value, otherwise \(p(d\geq4)\) for any given roll would need to be computed
+  using the probabilities of outcomes of previous rolls.
+
+  \item In order to compute the value \(p\) that maximizes \(L(p)\) we must
+  take the derivative and solve for when it is equal to zero. First, before
+  taking the derivative of \(L(p)=p^3(1-p)^2\) it is useful to apply
+  natural log to simplify the expression:
+  \[ln(L(p))=ln(p^3(1-p)^2)\]
+  \[ln(L(p))=3ln(p) + 2ln(1-p)\]
+  Differentiating and setting the left hand side to zero:
+  \[0 = \frac{3}{p} - \frac{2}{1-p}\]
+  Which, when simplified, yields \(p=0.6\). This answer is reasonable because,
+  in order to achieve heads, H, 3 times in a sequence of 5, the
+  optimal bias on the coin would require H to appear 60\% of the time.
+
+  \item To find \(\nabla f(w)\):
+  \[
+		\nabla f(w) = \frac{\partial}{\partial w}
+    \left(\sum_{i=1}^n\sum_{j=1}^n (a_i^Tw - b_j^Tw)^2 + \lambda \lVert
+    w \rVert_2^2\right)
+  \]
+  which by linearity can be written as:
+  \[
+		\nabla f(w) = \sum_{i=1}^n\sum_{j=1}^n
+    \frac{\partial}{\partial w} (a_i^Tw - b_j^Tw)^2 +
+    \lambda \frac{\partial}{\partial w} \lVert w \rVert_2^2
+  \]
+  differentiating the terms under the sum yields:
+  \[
+		\nabla f(w) = 2\sum_{i=1}^n\sum_{j=1}^n
+    (a_i^Tw - b_j^Tw)(a_i^T - b_j^T) +
+    \lambda \frac{\partial}{\partial w} \lVert w \rVert_2^2
+  \]
+  derivative of the 2-norm is \(\frac{w}{\lVert w \rVert_2^2}\) which
+  will arise as part of the chain rule, so differentiating the term
+  multiplying \(\lambda\) will result in:
+  \[
+		2 \lVert w \rVert_2^2 \left( \frac{w}{\lVert w \rVert_2^2} \right) = 2w
+  \]
+  rendering the gradient:
+  \[
+		\nabla f(w) = 2\sum_{i=1}^n\sum_{j=1}^n
+    (a_i^Tw - b_j^Tw)(a_i^T - b_j^T) +
+    2\lambda w
+  \]
+
+
+\end{enumerate}
+
+\section*{Problem 2}
+
+\begin{enumerate}[label=(\alph*)]
+  \item For each word in the text of \(n\) words, there are four possible tags.
+  The number of possible sequences is given by taking the number tag of choices
+  \(x\) for each word in the text and multiplying them, otherwise written:
+  \[
+		\prod_{i=1}^nx_i
+  \]
+  In this case there are four possible tags (\(x=4\)) yielding \(4^n\) possible
+  sequences.
+
+  \item The journey from city \(i\) to city \(j\) can be depicted as a
+  directed graph where edge values denote the ost of going forward from
+  one city to the next (vertices in the graph). This problem is most
+  efficiently solved by Djikstra's algorithm for computing the least-cost
+  path between two points in a graph. In general, the asymptotic run-time is
+  \(O(\lvert V \rvert^2)\) where \(V\) represents the number of vertices. For
+  sparse graphs however, this can be reduced to
+  \(O(\lvert E \rvert + \lvert V \rvert \text{log}( \lvert V \rvert ))\).
+\end{enumerate}
+
+\end{document}
