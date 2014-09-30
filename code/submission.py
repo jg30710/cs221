@@ -6,7 +6,7 @@ import collections
 def computeMaxWordLength(text):
 	"""
 		Given a string |text|, return the longest word in |text|.  If there are
-		ties, choose the word that comes latest in the alphabet. There won't be 
+		ties, choose the word that comes latest in the alphabet. There won't be
 		puctuations and there will only be splits on spaces. You might find
 		max() and list comprehensions handy here.
 	"""
@@ -71,14 +71,14 @@ def incrementSparseVector(v1, scale, v2):
 
 def computeMostFrequentWord(text):
 	"""
-		Splits the string |text| by whitespace and returns two things as a pair: 
+		Splits the string |text| by whitespace and returns two things as a pair:
 				the set of words that occur the maximum number of times, and
 		their count, i.e.
 		(set of words that occur the most number of times, that maximum number/count)
 		You might find it useful to use collections.Counter().
 	"""
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	textCounter = collections.Counter(text.split(" "))
+	textCounter = collections.Counter(text.split())
 	mostCommonTuple = textCounter.most_common(1)[0]
 	count = mostCommonTuple[1]
 	ties = set([tie[0] for tie in textCounter.most_common() if tie[1] >= count])

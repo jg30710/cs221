@@ -13,9 +13,18 @@ grader.addBasicPart('writeupValid', lambda : grader.requireIsValidPdf('writeup.p
 
 ############################################################
 # Problem 3a: computeMaxWordLength
+letters='abcdefghijklmnopqrstuvwxyz'
+threeaText = ''
+for i in range(20000):
+	word = ''
+	for j in range(random.randint(1,10)):
+		word += letters[random.randint(0,25)]
+	threeaText += word + " "
+
+threeaText += "thomasIsTheBest"
 
 grader.addBasicPart('3a-0', lambda :
-        grader.requireIsEqual('longest', submission.computeMaxWordLength('which is the longest word')))
+        grader.requireIsEqual('thomasIsTheBest', submission.computeMaxWordLength(threeaText)))
 
 
 ############################################################
@@ -25,6 +34,8 @@ def test():
     func = submission.createExistsFunction('the quick brown fox jumps over the lazy fox')
     grader.requireIsEqual(True, func('lazy'))
     grader.requireIsEqual(False, func('laz'))
+    func = submission.createExistsFunction('')
+    grader.requireIsEqual(False, func(''))
 grader.addBasicPart('3b-0', test)
 
 
