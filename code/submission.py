@@ -11,7 +11,7 @@ def computeMaxWordLength(text):
 		max() and list comprehensions handy here.
 	"""
 	# BEGIN_YOUR_CODE (around 1 line of code expected)
-	return max(text.split(" "), key=lambda x : len(x))
+	return max(sorted(text.split(), None, None, reverse=True), key=lambda x: len(x))
 	# END_YOUR_CODE
 
 ############################################################
@@ -24,7 +24,7 @@ def createExistsFunction(text):
 		useful to use set().
 	"""
 	# BEGIN_YOUR_CODE (around 4 lines of code expected)
-	textSet = set(text.split(" "))
+	textSet = set(text.split())
 	return (lambda word : word in textSet)
 	# END_YOUR_CODE
 
@@ -98,5 +98,21 @@ def computeLongestPalindrome(text):
 		You should first define a recurrence before you start coding.
 	"""
 	# BEGIN_YOUR_CODE (around 19 lines of code expected)
-	raise Exception("Not implemented yet")
+	cache = {}
+	def isPalindrome(t):
+		return t == t[::-1];
+	def removeCharAtIndex(t, i):
+		return t[:i] + t[i+1:]
+	def recurse(t,m,n):
+		if t in cache:
+			return cache[t]
+		if isPalindrome(t):
+			ans = len(t)
+		elif t[m] == t[n]:
+			ans = recurse(t, m + 1, n - 1)
+		else:
+			ans = max(recurse(removeCharAtIndex(t, n), m, n-1), recurse(removeCharAtIndex(t, m), m, n-1))
+		cache[t] = ans
+		return ans
+	return recurse(text,0, len(text) -1)
 	# END_YOUR_CODE
