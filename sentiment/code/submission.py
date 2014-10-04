@@ -42,23 +42,26 @@ def learnPredictor(trainExamples, testExamples, featureExtractor):
 	'''
 	weights = {}  # feature => weight
 	# BEGIN_YOUR_CODE (around 15 lines of code expected)
-	def dloss(w, i):
+	def dhloss(w, i):
 		x, y = trainExamples[i]
 		phi = featureExtractor(x)
+		margin = dotProduct(phi, w) * y
 		grad = {}
-		increment(grad, 2 * (dotProduct(phi, w) - y), phi)
-		return grad
+		increment(grad, -y, phi)
+		return grad if margin <=1 else {}
 	def predictor(x):
 		return dotProduct(featureExtractor(x), weights)
 	def sgd(dF, n):
-		numIters = 10
-		eta = 0.1
+		numIters = 20 
+		eta = 1
 		for it in range(numIters):
 			for i in range(n):
 				grad = dF(weights, i)
-			increment(weights, -eta, grad)
+				increment(weights, -eta, grad)
+	sgd(dhloss, len(trainExamples))
+	print "train " + str(evaluatePredictor(trainExamples, predictor))
+	print "test " + str(evaluatePredictor(testExamples, predictor))
 	# END_YOUR_CODE
-	sgd(dloss, len(trainExamples))
 	return weights
 
 ############################################################
