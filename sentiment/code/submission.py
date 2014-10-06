@@ -52,15 +52,13 @@ def learnPredictor(trainExamples, testExamples, featureExtractor):
 	def predictor(x):
 		return dotProduct(featureExtractor(x), weights)
 	def sgd(dF, n):
-		numIters = 20 
+		numIters = 20
 		eta = 1
 		for it in range(numIters):
 			for i in range(n):
 				grad = dF(weights, i)
 				increment(weights, -eta, grad)
 	sgd(dhloss, len(trainExamples))
-	print "train " + str(evaluatePredictor(trainExamples, predictor))
-	print "test " + str(evaluatePredictor(testExamples, predictor))
 	# END_YOUR_CODE
 	return weights
 
@@ -78,7 +76,10 @@ def generateDataset(numExamples, weights):
 	# y should be 1 or -1 as classified by the weight vector.
 	def generateExample():
 			# BEGIN_YOUR_CODE (around 5 lines of code expected)
-			raise Exception("Not implemented yet")
+			numWeights = len(weights)
+			weightKeys = weights.keys()
+			phi = {random.choice(weightKeys) : 1 for i in range(5)}
+			y = math.copysign(1, dotProduct(weights, phi))
 			# END_YOUR_CODE
 			return (phi, y)
 	return [generateExample() for _ in range(numExamples)]
@@ -94,7 +95,8 @@ def extractCharacterFeatures(n):
 	'''
 	def extract(x):
 			# BEGIN_YOUR_CODE (around 10 lines of code expected)
-			raise Exception("Not implemented yet")
+			x = x.replace(" ", "").replace("\t", "")
+			return dict(Counter([x[i:i+n] for i in range(len(x) - n + 1)]))
 			# END_YOUR_CODE
 	return extract
 
