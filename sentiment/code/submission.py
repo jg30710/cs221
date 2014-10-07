@@ -4,6 +4,7 @@ import random
 import collections
 import math
 import sys
+import copy 
 from collections import Counter
 from util import *
 
@@ -52,7 +53,7 @@ def learnPredictor(trainExamples, testExamples, featureExtractor):
 	def predictor(x):
 		return dotProduct(featureExtractor(x), weights)
 	def sgd(dF, n):
-		numIters = 20
+		numIters = 10
 		eta = 1
 		for it in range(numIters):
 			for i in range(n):
@@ -123,5 +124,45 @@ def kmeans(examples, K, maxIters):
 					final reconstruction loss)
 	'''
 	# BEGIN_YOUR_CODE (around 35 lines of code expected)
-	raise Exception("Not implemented yet")
+	clusters = [random.choice(examples) for i in range(K)]
+	print clusters
+	exLength = len(examples)
+	kLength = len(clusters)
+	# Create a list of zeros the same size as examples
+	assignments = [0] * exLength
+	def distance(phi, mu):
+		v = copy.copy(phi)
+		increment(v, -1, mu)
+		return dotProduct(v, v)
+	def loss():
+		l = 0
+		for e in range(exLength):
+			k = assignments[e]
+			l += distance(examples[e], clusters[k]
+		return l
+	def assignPointsToCentroids():
+		for e in range(exLength):
+			vals = [(distance(examples[e], clusters[i]), i) for i, val in enumerate(clusters)]
+			print vals
+			minVal, index = min(vals)
+			print "Min " + str(minVal) + " at " + str(index)
+			assignments[e] = index
+	def bestCentroidForClusters():
+		phiInCluster = 0
+		vectorSum = {}
+		for k in range(kLength):
+			for e in range(exLength):
+				if assignments[e] == k:
+					phiInCluster += 1
+					increment(vectorSum, 1, examples[e])
+			print "VECTOR SUM"
+			print vectorSum
+			if phiInCluster == 0:
+				phiInCluster = 1
+			clusters[k] = {key : val/phiInCluster for key, val in vectorSum.items()}
+			phiInCluster = 0
+	for k in range(K):
+		assignPointsToCentroids()
+		bestCentroidForClusters()
+	return (clusters, assignments, loss())
 	# END_YOUR_CODE
