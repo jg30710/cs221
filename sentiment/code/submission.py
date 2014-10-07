@@ -130,7 +130,7 @@ def kmeans(examples, K, maxIters):
 	# Create a list of zeros the same size as examples
 	assignments = [0] * exLength
 	def squareDistance(phi, mu):
-		v = dict.copy(phi)
+		v = dict(phi)
 		increment(v, -1.0, mu)
 		return dotProduct(v, v)
 	def loss():
