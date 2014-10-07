@@ -4,7 +4,6 @@ import random
 import collections
 import math
 import sys
-import copy 
 from collections import Counter
 from util import *
 
@@ -124,6 +123,7 @@ def kmeans(examples, K, maxIters):
 					final reconstruction loss)
 	'''
 	# BEGIN_YOUR_CODE (around 35 lines of code expected)
+	random.seed(42)
 	clusters = [random.choice(examples) for i in range(K)]
 	print clusters
 	exLength = len(examples)
@@ -131,18 +131,18 @@ def kmeans(examples, K, maxIters):
 	# Create a list of zeros the same size as examples
 	assignments = [0] * exLength
 	def distance(phi, mu):
-		v = copy.copy(phi)
+		v = dict.copy(phi)
 		increment(v, -1, mu)
 		return dotProduct(v, v)
 	def loss():
 		l = 0
 		for e in range(exLength):
 			k = assignments[e]
-			l += distance(examples[e], clusters[k]
+			l += distance(examples[e], clusters[k])
 		return l
 	def assignPointsToCentroids():
 		for e in range(exLength):
-			vals = [(distance(examples[e], clusters[i]), i) for i, val in enumerate(clusters)]
+			vals = [(distance(examples[e], clusters[k]), k) for k, val in enumerate(clusters)]
 			print vals
 			minVal, index = min(vals)
 			print "Min " + str(minVal) + " at " + str(index)
