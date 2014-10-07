@@ -159,7 +159,7 @@ def kmeans(examples, K, maxIters):
 			phiInCluster = 0
 			vectorSum = {}
 	for i in range(maxIters):
-		lastAssignments = assignments
+		lastAssignments = list(assignments)
 		assignPointsToCentroids()
 		# If the assignments haven't changed, we can't update the centroids.
 		# Call it quits
