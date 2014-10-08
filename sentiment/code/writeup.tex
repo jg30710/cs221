@@ -114,7 +114,7 @@ that all of this is my own work.
 			\[
 				\text{Loss}_\text{hinge} =
 					\begin{cases}
-						\sum_{j=0}^k (w \cdot \Phi(x_i) - max(w \cdot \Phi(x\notin I))) \text{ where } i \in I_j & \text{ if margin less than 0 } \\
+						1 - \sum_{j=0}^k (w \cdot \Phi(x_i) - max(w \cdot \Phi(x\notin I))) \text{ where } i \in I_j & \text{ if margin less than 0 } \\
 						0 & \text{ margin greater than 1 } 
 					\end{cases}
 			\]
@@ -204,10 +204,10 @@ that all of this is my own work.
 		\item Running learnPredictor using extractCharacterFeatures had training and dev
 			nearly on par with extractWordFeatures as \(n\) grew larger, \(n = 4\) in fact
 			had nearly identical error. The reason for this is that the n-grams capture
-			an additional piece of information rather than specific words themselves,
-			occurrences and patterns of words next to each other. This can be thought of
+			an additional piece of information--word proximity. This can be thought of
 			in the manner that reviews of similar rating (positive or negative) use
-			similar words in conjunction which is captured by the list of n-grams.
+			similar phrases (hence the words are often collocated) which is captured by the list of n-grams
+			since they are not limited to returning data from a single word.
 			A sample sentence that would be better analyzed by n-grams would be:
 
 			The movie was not bad.
@@ -215,8 +215,8 @@ that all of this is my own work.
 			Not and bad would most likely be made heavily negative after training with
 			extractWordFeatures since those words (in any location in the sentence)
 			appear more often in bad reviews, but n-grams would catch the proximity
-			of not and bad and be able to find that occurrence as a common phrase in
-			good reviews.
+			of not and bad and be able to find that occurrence as a common phrase across
+			several good reviews.
 
 	\end{enumerate}
 
@@ -249,13 +249,13 @@ that all of this is my own work.
 				\text{min} \{ ( [0,0] - [0, -1] )^2, ( [0,0] - [2, 2] )^2\} \\
 				\text{min} \{ ( [0,-1] )^2, ( [-2, -2] )^2\} \\
 				\text{min} \{ 1, 8\} \\
-				\Phi(x_2) \rightarrow \mu_1
+				\Phi(x_3) \rightarrow \mu_1
 			\end{gather*}
 			\begin{gather*}
 				\text{min} \{ ( [0,2] - [0, -1] )^2, ( [0,2] - [2, 2] )^2\} \\
 				\text{min} \{ ( [0,3] )^2, ( [-2, 0] )^2\} \\
 				\text{min} \{ 9, 4\} \\
-				\Phi(x_2) \rightarrow \mu_2
+				\Phi(x_4) \rightarrow \mu_2
 			\end{gather*}
 			Then we recompute the centroids from the point vector averages:
 			\begin{gather*}
@@ -279,13 +279,13 @@ that all of this is my own work.
 				\text{min} \{ ( [0,0] - [0.5, 0] )^2, ( [0,0] - [1, 1.5] )^2\} \\
 				\text{min} \{ ( [-0.5,0] )^2, ( [-1, -1.5] )^2\} \\
 				\text{min} \{ 0.25, 3.25\} \\
-				\Phi(x_2) \rightarrow \mu_1
+				\Phi(x_3) \rightarrow \mu_1
 			\end{gather*}
 			\begin{gather*}
 				\text{min} \{ ( [0,2] - [0.5, 0] )^2, ( [0,2] - [1, 1.5] )^2\} \\
 				\text{min} \{ ( [0.5,2] )^2, ( [-1, 0.5] )^2\} \\
 				\text{min} \{ 4.25, 1.25\} \\
-				\Phi(x_2) \rightarrow \mu_2
+				\Phi(x_4) \rightarrow \mu_2
 			\end{gather*}
 			The assignments have stopped changing and so we've reached end result (1):
 			\[
@@ -315,13 +315,13 @@ that all of this is my own work.
 				\text{min} \{ ( [0,0] - [2, 0] )^2, ( [0,0] - [-1, 0] )^2\} \\
 				\text{min} \{ ( [-2,0] )^2, ( [1, 0] )^2\} \\
 				\text{min} \{ 1, 8\} \\
-				\Phi(x_2) \rightarrow \mu_1
+				\Phi(x_3) \rightarrow \mu_1
 			\end{gather*}
 			\begin{gather*}
 				\text{min} \{ ( [0,2] - [2, 0] )^2, ( [0,2] - [-1, 0] )^2\} \\
 				\text{min} \{ ( [-2,2] )^2, ( [1, 2] )^2\} \\
 				\text{min} \{ 8, 5\} \\
-				\Phi(x_2) \rightarrow \mu_2
+				\Phi(x_4) \rightarrow \mu_2
 			\end{gather*}
 			Then we recompute the centroids from the point vector averages:
 			\begin{gather*}
@@ -345,13 +345,13 @@ that all of this is my own work.
 				\text{min} \{ ( [0,0] - [1, 0.3] )^2, ( [0,0] - [0, 2] )^2\} \\
 				\text{min} \{ ( [-1,-0.3] )^2, ( [0, 2] )^2\} \\
 				\text{min} \{ 1.9, 4\} \\
-				\Phi(x_2) \rightarrow \mu_1
+				\Phi(x_3) \rightarrow \mu_1
 			\end{gather*}
 			\begin{gather*}
 				\text{min} \{ ( [0,2] - [1, 0.3] )^2, ( [0,2] - [0, 2] )^2\} \\
 				\text{min} \{ ( [-1,1.7] )^2, ( [0, 0] )^2\} \\
 				\text{min} \{ 2.69, 0\} \\
-				\Phi(x_2) \rightarrow \mu_2
+				\Phi(x_4) \rightarrow \mu_2
 			\end{gather*}
 			The assignments have stopped changing and so we've reached end result (2):
 			\[
@@ -367,7 +367,7 @@ that all of this is my own work.
 
 		\item Programming assignment
 		\item Knowing that certain points belong in a particular cluster, the k-means
-			algorithm could be changed into the following pseudo code:
+			algorithm could be represented by the following pseudo code:
 
 			\begin{verbatim}
 				# Preprocess the points belonging to a particular cluster by
