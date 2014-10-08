@@ -1,0 +1,398 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 2}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+	\section*{Problem 1}
+
+	\begin{enumerate}[label=(\alph*)]
+		\item To compute weights using stochastic gradient descent, we first
+			define each feature vector for the reviews ordered
+			{'pretty', 'good', 'bad', 'plot', 'scenery'}:
+
+			\begin{gather*}
+				\Phi(x_1) = [1, 1, 0, 0, 0, 0] \text{ and } y = 1 \\
+				\Phi(x_2) = [0, 0, 1, 1, 0, 0] \text{ and } y = -1 \\
+				\Phi(x_3) = [0, 0, 1, 0, 1, 0] \text{ and } y = 1 \\
+				\Phi(x_4) = [1, 0, 0, 0, 0, 1] \text{ and } y = 1
+			\end{gather*}
+
+			Now the computation of
+			\(w \leftarrow \eta \nabla_w \text{Loss}_\text{hinge}(x,y,w)\)
+			can proceed.
+			We initialize \(w\) to the vector of all zeros and begin computation
+			over the set \(\Phi(x)\) vectors assuming \(\eta = 1\). First will
+			be the computation of the gradient of the hinge loss followed by
+			the update of \(w\):
+			\[
+				w \cdot \Phi(x_1) = [0, 0, 0, 0, 0, 0] \cdot [1, 1, 0, 0, 0, 0] = 0
+			\]
+			since the margin is less than \(1\) we return \(-\Phi(x_1)y\) and update
+			\(w\) appropriately:
+			\[
+				w = [0, 0, 0, 0, 0, 0] + [1, 1, 0, 0, 0, 0] = [1, 1, 0, 0, 0, 0]
+			\]
+			we continue in the same fashion for the remaining \(\Phi(x)\).
+			For \(\Phi(x_2)\):
+			\[
+				w \cdot \Phi(x_2) = [1, 1, 0, 0, 0, 0] \cdot [0, 0, 1, 1, 0, 0] = 0
+			\]
+			since the margin is less than \(1\) we return \(-\Phi(x_2)y\) and update
+			\(w\):
+			\[
+				w = [1, 1, 0, 0, 0, 0] - [0, 0, 1, 1, 0, 0] = [1, 1, -1, -1, 0, 0]
+			\]
+			For \(\Phi(x_3)\):
+			\[
+				w \cdot \Phi(x_3) = [1, 1, -1, -1, 0, 0] \cdot [0, 0, 1, 0, 1, 0] = -1
+			\]
+			since the margin is less than \(1\) we return \(-\Phi(x_3)y\) and update
+			\(w\):
+			\[
+				w = [1, 1, -1, -1, 0, 0] + [0, 0, 1, 0, 1, 0] = [1, 1, 0, -1, 1, 0]
+			\]
+			For \(\Phi(x_4)\):
+			\[
+				w \cdot \Phi(x_4) = [1, 1, 0, -1, 1, 0] \cdot [1, 0, 0, 0, 0, 1] = 1
+			\]
+			since the margin is equal to \(1\) I choose to return
+			\(-\Phi(x_4)y\) and update \(w\):
+			\[
+				w = [1, 1, 0, -1, 1, 0] + [1, 0, 0, 0, 0, 1] = [2, 1, 0, -1, 1, 1]
+			\]
+			making the final value for \(w = [2, 1, 0, -1, 1, 1]\).
+
+		\item Creating a set of vectors from the set of words {'not', 'good', 'bad'}
+			we have the vectors:
+			\begin{gather*}
+				\Phi(x_1) = [0, 1, 0] \text{ and } y = 1 \\
+				\Phi(x_2) = [0, 0, 1] \text{ and } y = -1 \\
+				\Phi(x_3) = [1, 1, 0] \text{ and } y = -1 \\
+				\Phi(x_4) = [1, 0, 1] \text{ and } y = 1
+			\end{gather*}
+			Although the set of \(\Phi(x)\) consists of four vectors, only 3 are
+			unique, \(\Phi(x_3)\) for instance can be written as:
+			\[
+				\Phi(x_3) = \Phi(x_1) - \Phi(x_2) + \Phi(x_4)
+			\]
+			meaning that, at most, \(w\) can properly fit \(3\) of the \(4\)
+			vectors. This is because the output values \(y\) form a four
+			dimensional vector, but the set of current \(\Phi(x)\) only
+			map to three dimensions. The way that we can solve this is by 
+			adding a new feature that makes these vectors linearly independent.
+			The feature I propose is word connotation product
+			(ex: not * bad = \(-1 \cdot -1 = 1\)).
+			This transforms the vectors to the following:
+			\begin{gather*}
+				\Phi(x_1) = [0, 1, 0, 0] \text{ and } y = 1 \\
+				\Phi(x_2) = [0, 0, 1, 0] \text{ and } y = -1 \\
+				\Phi(x_3) = [1, 1, 0, -1] \text{ and } y = -1 \\
+				\Phi(x_4) = [1, 0, 1, 1] \text{ and } y = 1
+			\end{gather*}
+			These vectors are linearly independent and have a \(w\)
+			for which there is \(0\) error. That one such solution
+			is the vector:
+			\[
+				[1, 1, -1, 3]
+			\]
+
+		\item The generaliztion of the hinge loss with movie review
+			rankings amounts to the following
+			\[
+				\text{Loss}_\text{hinge} =
+					\begin{cases}
+						\sum_{j=0}^k (w \cdot \Phi(x_i) - max(w \cdot \Phi(x\notin I))) \text{ where } i \in I_j & \text{ if margin less than 0 } \\
+						0 & \text{ margin greater than 1 } 
+					\end{cases}
+			\]
+			The max in this piecewise function can be precomputed since it will be the same for each item in the sum.
+
+	\end{enumerate}
+
+	\section*{Problem 2}
+
+	\begin{enumerate}[label=(\alph*)]
+		\item Programming assignment 
+		\item Programming assignment 
+		\item Programming assignment 
+
+		\item I chose \(\eta = 0.1\) and numIters to be 5. The reasoning for this
+			is that this was the combination that reduced overfitting amongst other
+			test cases. Increasing iterations would keep the error down, but the 
+			train error would be depressed more significantly as well.
+			The associated training and test errors are as follows:
+			\begin{gather*}
+				\eta = 0.1 \text{ and numIters }= 5:
+					\text{Official: train error = 0.0751266178953, dev error = 0.294316263365} \\
+				\eta = 0.5 \text{ and numIters }= 5:
+					\text{Official: train error = 0.0925717501407, dev error = 0.300787844682} \\
+				\eta = 0.5 \text{ and numIters }= 10:
+					\text{Official: train error = 0.0241980866629, dev error = 0.281091727631} \\
+				\eta = 1 \text{ and numIters }= 10:
+					\text{Official: train error = 0.0250422059651, dev error = 0.286156443444} \\
+				\eta = 1 \text{ and numIters }= 5:
+					\text{Official: train error = 0.164884637029, dev error = 0.330050647158}
+			\end{gather*}
+
+		\item Analyzing the wrong answers from the output:
+
+			=== seldom has a movie so closely matched the spirit of a man and his work .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				Here, there are an abundance of stop-words that were weighted heavily negative.
+
+			=== a heady , biting , be-bop ride through nighttime manhattan , a loquacious videologue of the modern male and the lengths to which he'll go to weave a protective cocoon around his own ego .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				Again, several negative stop words, but also a few positive words that had 0 weight. If the advanced vocabulary were better weighted the review would have been correct.
+
+			=== wickedly funny , visually engrossing , never boring , this movie challenges us to think about the ways we consume pop culture .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				This one contains several stop-words, heavily weighted negative words (boring) and negative punction weights.
+
+			=== rain is a small treasure , enveloping the viewer in a literal and spiritual torpor that is anything but cathartic .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				This sentence contains very few words with positive weight.
+
+			=== only in its final surprising shots does rabbit-proof fence find the authority it's looking for .
+			Truth: -1, Prediction: 1 [WRONG]
+
+				Problematic because it contained words that usually have negative connotation to positively review the movie.
+
+			=== even during the climactic hourlong cricket match , boredom never takes hold .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				More aggravated problem than the previous example, it uses several negative words to create a positive review.
+
+			=== time out is as serious as a pink slip . and more than that , it's an observant , unfussily poetic meditation about identity and alienation .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				Again, too many negative stop-words.
+
+			=== alternative medicine obviously has its merits . . . but ayurveda does the field no favors .
+			Truth: -1, Prediction: 1 [WRONG]
+
+				This review contained the use of ellipses and periods have negative weight.
+
+			=== no screen fantasy-adventure in recent memory has the showmanship of clones' last 45 minutes .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				The hyphenated fantasy adventure portion was categorized as a single element and could have contributed positively.
+
+			=== a clever blend of fact and fiction .
+			Truth: 1, Prediction: -1 [WRONG]
+
+				This review was short and the few key words carried negative weight.
+
+		\item Programming assignment
+
+		\item Running learnPredictor using extractCharacterFeatures had training and dev
+			nearly on par with extractWordFeatures as \(n\) grew larger, \(n = 4\) in fact
+			had nearly identical error. The reason for this is that the n-grams capture
+			an additional piece of information rather than specific words themselves,
+			occurrences and patterns of words next to each other. This can be thought of
+			in the manner that reviews of similar rating (positive or negative) use
+			similar words in conjunction which is captured by the list of n-grams.
+			A sample sentence that would be better analyzed by n-grams would be:
+
+			The movie was not bad.
+
+			Not and bad would most likely be made heavily negative after training with
+			extractWordFeatures since those words (in any location in the sentence)
+			appear more often in bad reviews, but n-grams would catch the proximity
+			of not and bad and be able to find that occurrence as a common phrase in
+			good reviews.
+
+	\end{enumerate}
+
+	\section*{Problem 3}
+
+	\begin{enumerate}[label=(\alph*)]
+		\item Given points:
+			\begin{gather*}
+				\Phi(x_1) = [0, 1] \\
+				\Phi(x_2) = [2, 1] \\
+				\Phi(x_3) = [0, 0] \\
+				\Phi(x_4) = [0, 2]
+			\end{gather*}
+			we run k-means for centroids
+			\(\mu_1 = [0, -1] \text{ and } \mu_2 = [2, 2]\)
+			by first assigning points to the centroids:
+			\begin{gather*}
+				\text{min} \{ ( [1,0] - [0, -1] )^2, ( [1,0] - [2, 2] )^2\} \\
+				\text{min} \{ ( [1,1] )^2, ( [-1, -2] )^2\} \\
+				\text{min} \{ 4, 5\} \\
+				\Phi(x_1) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [2,1] - [0, -1] )^2, ( [2,1] - [2, 2] )^2\} \\
+				\text{min} \{ ( [2,2] )^2, ( [0, -1] )^2\} \\
+				\text{min} \{ 8, 1\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,0] - [0, -1] )^2, ( [0,0] - [2, 2] )^2\} \\
+				\text{min} \{ ( [0,-1] )^2, ( [-2, -2] )^2\} \\
+				\text{min} \{ 1, 8\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,2] - [0, -1] )^2, ( [0,2] - [2, 2] )^2\} \\
+				\text{min} \{ ( [0,3] )^2, ( [-2, 0] )^2\} \\
+				\text{min} \{ 9, 4\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			Then we recompute the centroids from the point vector averages:
+			\begin{gather*}
+				\mu_1 = \frac{1}{2} ( [1,0] + [0, 0] ) =  [0.5, 0] \\
+				\mu_2 = \frac{1}{2} ( [2,1] + [0, 2] ) =  [1, 1.5] \\
+			\end{gather*}
+			Now we see if any of the clusters change:
+			\begin{gather*}
+				\text{min} \{ ( [1,0] - [0.5, 0] )^2, ( [1,0] - [1, 1.5] )^2\} \\
+				\text{min} \{ ( [0.5,0] )^2, ( [0, -1.5] )^2\} \\
+				\text{min} \{ 0.25, 2.25\} \\
+				\Phi(x_1) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [2,1] - [0.5, 0] )^2, ( [2,1] - [1, 1.5] )^2\} \\
+				\text{min} \{ ( [1.5,1] )^2, ( [1, -0.5] )^2\} \\
+				\text{min} \{3.25, 1.25\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,0] - [0.5, 0] )^2, ( [0,0] - [1, 1.5] )^2\} \\
+				\text{min} \{ ( [-0.5,0] )^2, ( [-1, -1.5] )^2\} \\
+				\text{min} \{ 0.25, 3.25\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,2] - [0.5, 0] )^2, ( [0,2] - [1, 1.5] )^2\} \\
+				\text{min} \{ ( [0.5,2] )^2, ( [-1, 0.5] )^2\} \\
+				\text{min} \{ 4.25, 1.25\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			The assignments have stopped changing and so we've reached end result (1):
+			\[
+				\mu_1 = [0.5, 0] \text{ and } \mu_2 = [1, 1.5]
+			\]
+			\begin{gather*}
+				\Phi(x_1) \rightarrow \mu_1 \\
+				\Phi(x_2) \rightarrow \mu_2 \\
+				\Phi(x_3) \rightarrow \mu_1 \\
+				\Phi(x_4) \rightarrow \mu_2
+			\end{gather*}
+			Now for the next set of centroids
+			\(\mu_1 = [2, 0] \text{ and } \mu_2 = [-1, 0]\)
+			\begin{gather*}
+				\text{min} \{ ( [1,0] - [2, 0] )^2, ( [1,0] - [-1, 0] )^2\} \\
+				\text{min} \{ ( [-1,0] )^2, ( [2, 0] )^2\} \\
+				\text{min} \{ 1, 4\} \\
+				\Phi(x_1) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [2,1] - [2, 0] )^2, ( [2,1] - [-1, 0] )^2\} \\
+				\text{min} \{ ( [0,1] )^2, ( [3, 1] )^2\} \\
+				\text{min} \{ 1, 10\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,0] - [2, 0] )^2, ( [0,0] - [-1, 0] )^2\} \\
+				\text{min} \{ ( [-2,0] )^2, ( [1, 0] )^2\} \\
+				\text{min} \{ 1, 8\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,2] - [2, 0] )^2, ( [0,2] - [-1, 0] )^2\} \\
+				\text{min} \{ ( [-2,2] )^2, ( [1, 2] )^2\} \\
+				\text{min} \{ 8, 5\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			Then we recompute the centroids from the point vector averages:
+			\begin{gather*}
+				\mu_1 = \frac{1}{3} ( [1,0] + [2, 1] + [0, 0] ) =  [1, 0.3] \\
+				\mu_2 = [0, 2] \\
+			\end{gather*}
+			Check the assignments again...
+			\begin{gather*}
+				\text{min} \{ ( [1,0] - [1, 0.3] )^2, ( [1,0] - [0, 2] )^2\} \\
+				\text{min} \{ ( [0,0.3] )^2, ( [1, 2] )^2\} \\
+				\text{min} \{ 0.9, 5\} \\
+				\Phi(x_1) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [2,1] - [1, 0.3] )^2, ( [2,1] - [0, 2] )^2\} \\
+				\text{min} \{ ( [1,0.7] )^2, ( [2, -1] )^2\} \\
+				\text{min} \{ 1.49, 5\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,0] - [1, 0.3] )^2, ( [0,0] - [0, 2] )^2\} \\
+				\text{min} \{ ( [-1,-0.3] )^2, ( [0, 2] )^2\} \\
+				\text{min} \{ 1.9, 4\} \\
+				\Phi(x_2) \rightarrow \mu_1
+			\end{gather*}
+			\begin{gather*}
+				\text{min} \{ ( [0,2] - [1, 0.3] )^2, ( [0,2] - [0, 2] )^2\} \\
+				\text{min} \{ ( [-1,1.7] )^2, ( [0, 0] )^2\} \\
+				\text{min} \{ 2.69, 0\} \\
+				\Phi(x_2) \rightarrow \mu_2
+			\end{gather*}
+			The assignments have stopped changing and so we've reached end result (2):
+			\[
+				\mu_1 = [1, 0.3] \text{ and } \mu_2 = [0, 2]
+			\]
+			\begin{gather*}
+				\Phi(x_1) \rightarrow \mu_1 \\
+				\Phi(x_2) \rightarrow \mu_1 \\
+				\Phi(x_3) \rightarrow \mu_1 \\
+				\Phi(x_4) \rightarrow \mu_2
+			\end{gather*}
+
+
+		\item Programming assignment
+		\item Knowing that certain points belong in a particular cluster, the k-means
+			algorithm could be changed into the following pseudo code:
+
+			\begin{verbatim}
+				# Preprocess the points belonging to a particular cluster by
+				# finding the centroid between them
+				def bestCentroidForClusters:
+					for k clusters:
+						for e pinnedExamples:
+							# compute centroid, mark centroid as pinned
+
+				# Carry on computation as usual, skipping centroid assignment and movement
+				# for the pinned points
+				def assignPointsToCentroids:
+					for e examples:
+						if examples[e] is not pinned:
+						# business as usual, carry on
+				def bestCentroidForClusters:
+					for k clusters:
+						for e examples:
+							# compute centroid
+							if k is not pinned:
+								# Carry on computation as previously done
+				for i in range(maxIters):
+					assignPointsToCentroids()
+					bestCentroidForClusters()
+			\end{verbatim}
+	\end{enumerate}
+
+\end{document}
