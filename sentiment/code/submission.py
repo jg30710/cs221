@@ -134,7 +134,8 @@ def kmeans(examples, K, maxIters):
 	muDotProducts = [0] * kLength
 	def squareDistance(phi, mu, e, k):
 		# Transformation of the square norm from norm(phi - mu)^2 to norm(phi) + norm(mu) - 2 phi * mu
-		return phiDotProducts[e] + dotProduct(mu, mu) - 2 * dotProduct(phi, mu)
+		#return phiDotProducts[e] + dotProduct(mu, mu) - 2 * dotProduct(phi, mu)
+		return phiDotProducts[e] + muDotProducts[k] - 2 * dotProduct(phi, mu)
 	def loss():
 		l = 0
 		for e in range(exLength):
@@ -142,7 +143,6 @@ def kmeans(examples, K, maxIters):
 			l += squareDistance(examples[e], clusters[k], e, k)
 		return l
 	def assignPointsToCentroids():
-		#muDotProducts = [dotProduct(clusters[k], clusters[k]) for k in range(kLength)]
 		for e in range(exLength):
 			vals = [(squareDistance(examples[e], clusters[k], e, k), k) for k, val in enumerate(clusters)]
 			minVal, index = min(vals)
@@ -163,6 +163,7 @@ def kmeans(examples, K, maxIters):
 			vectorSum = {}
 	for i in range(maxIters):
 		lastAssignments = list(assignments)
+		muDotProducts = [dotProduct(clusters[k], clusters[k]) for k in range(kLength)]
 		assignPointsToCentroids()
 		# If the assignments haven't changed, we can't update the centroids.
 		# Call it quits
@@ -171,3 +172,9 @@ def kmeans(examples, K, maxIters):
 		bestCentroidForClusters()
 	return (clusters, assignments, loss())
 	# END_YOUR_CODE
+#examples = generateClusteringExamples(10000, 10, 10)
+#start = time.time()
+#centers, assignments, totalCost = kmeans(examples, 10, maxIters=10)
+#end = time.time()
+#print "Elapsed: " + str(end - start)
+#print "Loss: " + str(totalCost)
