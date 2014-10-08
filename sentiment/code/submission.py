@@ -6,6 +6,7 @@ import math
 import sys
 from collections import Counter
 from util import *
+import time
 
 ############################################################
 # Problem 2: binary classification
@@ -22,7 +23,7 @@ def extractWordFeatures(x):
 	Example: "I am what I am" --> {'I': 2, 'am': 2, 'what': 1}
 	"""
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	return Counter(x.split())
+	return dict(Counter(x.split()))
 	# END_YOUR_CODE
 
 ############################################################
@@ -52,8 +53,8 @@ def learnPredictor(trainExamples, testExamples, featureExtractor):
 	def predictor(x):
 		return dotProduct(featureExtractor(x), weights)
 	def sgd(dF, n):
-		numIters = 10
-		eta = 1
+		numIters = 5
+		eta = 0.1
 		for it in range(numIters):
 			for i in range(n):
 				grad = dF(weights, i)
@@ -129,19 +130,21 @@ def kmeans(examples, K, maxIters):
 	kLength = len(clusters)
 	# Create a list of zeros the same size as examples
 	assignments = [0] * exLength
-	def squareDistance(phi, mu):
-		v = dict(phi)
-		increment(v, -1.0, mu)
-		return dotProduct(v, v)
+	phiDotProducts = [dotProduct(examples[e], examples[e]) for e in range(exLength)]
+	muDotProducts = [0] * kLength
+	def squareDistance(phi, mu, e, k):
+		# Transformation of the square norm from norm(phi - mu)^2 to norm(phi) + norm(mu) - 2 phi * mu
+		return phiDotProducts[e] + dotProduct(mu, mu) - 2 * dotProduct(phi, mu)
 	def loss():
 		l = 0
 		for e in range(exLength):
 			k = assignments[e]
-			l += squareDistance(examples[e], clusters[k])
+			l += squareDistance(examples[e], clusters[k], e, k)
 		return l
 	def assignPointsToCentroids():
+		#muDotProducts = [dotProduct(clusters[k], clusters[k]) for k in range(kLength)]
 		for e in range(exLength):
-			vals = [(squareDistance(examples[e], clusters[k]), k) for k, val in enumerate(clusters)]
+			vals = [(squareDistance(examples[e], clusters[k], e, k), k) for k, val in enumerate(clusters)]
 			minVal, index = min(vals)
 			assignments[e] = index
 	def bestCentroidForClusters():
