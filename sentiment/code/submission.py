@@ -106,7 +106,18 @@ def extractCharacterFeatures(n):
 
 def extractExtraCreditFeatures(x):
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	raise Exception("Not implemented yet")
+	wordList = x.split()
+	words = Counter(wordList)
+	phi = dict(words)
+	phi.update(Counter(wordList))
+	def wordGrams(n):
+		def gramGen(x):
+			return dict(Counter([" ".join(x[i:i+n]) for i in range(len(x) - n + 1)]))
+		return gramGen
+	wg = wordGrams(2)
+	grams = wg(wordList)
+	phi.update(grams)
+	return phi
 	# END_YOUR_CODE
 
 ############################################################
@@ -124,7 +135,7 @@ def kmeans(examples, K, maxIters):
 					final reconstruction loss)
 	'''
 	# BEGIN_YOUR_CODE (around 35 lines of code expected)
-	random.seed()
+	random.seed(42)
 	clusters = [random.choice(examples) for i in range(K)]
 	exLength = len(examples)
 	kLength = len(clusters)
@@ -172,9 +183,3 @@ def kmeans(examples, K, maxIters):
 		bestCentroidForClusters()
 	return (clusters, assignments, loss())
 	# END_YOUR_CODE
-#examples = generateClusteringExamples(10000, 10, 10)
-#start = time.time()
-#centers, assignments, totalCost = kmeans(examples, 10, maxIters=10)
-#end = time.time()
-#print "Elapsed: " + str(end - start)
-#print "Loss: " + str(totalCost)

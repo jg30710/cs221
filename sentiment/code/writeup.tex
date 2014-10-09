@@ -102,23 +102,55 @@ that all of this is my own work.
 				\Phi(x_3) = [1, 1, 0, -1] \text{ and } y = -1 \\
 				\Phi(x_4) = [1, 0, 1, 1] \text{ and } y = 1
 			\end{gather*}
-			These vectors are linearly independent and have a \(w\)
-			for which there is \(0\) error. That one such solution
-			is the vector:
+			If these feature vectors and solution vector were placed
+			into a matrix:
 			\[
-				[1, 1, -1, 3]
+				\left[
+					\begin{array}{cccc|c}
+						0 & 1 & 0 & 0 & -1 \\
+						0 & 0 & 1 & 0  & 1 \\
+						1 & 1 & 0 & -1 & -1 \\
+						1 & 0 & 1 & 1 & 1 \\
+					\end{array}
+				\right]
+			\]
+			and then converted to row-echelon form:
+			\[
+				\left[
+					\begin{array}{cccc|c}
+						1 & 0 & 0 & 0 & 0 \\
+						0 & 1 & 0 & 0  & 1 \\
+						0 & 0 & 1 & 0 & -1 \\
+						0 & 0 & 0 & 1 & 2 \\
+					\end{array}
+				\right]
+			\]
+			It is clear that the system has no free variables meaning
+			these vectors are linearly independent and have a \(w\)
+			for which there is \(0\) error, in this case, the vector:
+			\[
+				[0, 1, -1, 2]
 			\]
 
-		\item The generaliztion of the hinge loss with movie review
-			rankings amounts to the following
+		\item From the example given about computing the hinge loss
+			over reviews in \(I\), written as:
+			\[
+				[1 - (2 - 5)] + [1 - (5 - 5)] = 5
+			\]
+			Has the form \(\text{sum}(1 - (\text{score}_{I_k} - \text{ max (score not in I)} \text{ for all k in I}))\)
+			From this it follows that the generaliztion of the hinge loss with movie
+			review rankings amounts to:
 			\[
 				\text{Loss}_\text{hinge} =
+					\text{max}
 					\begin{cases}
-						1 - \sum_{j=0}^k (w \cdot \Phi(x_i) - max(w \cdot \Phi(x\notin I))) \text{ where } i \in I_j & \text{ if margin less than 0 } \\
+						\sum_{j=0}^k 1 - (w \cdot \Phi(x_i) - \sigma) \text{ where } i \in I_j & \text{ if margin less than 0 } \\
 						0 & \text{ margin greater than 1 } 
 					\end{cases}
 			\]
-			The max in this piecewise function can be precomputed since it will be the same for each item in the sum.
+			where \(\sigma = \text{max}(w \cdot \Phi(x\notin I))\).
+
+			The value \(\sigma\) can be precomputed before the sum since it is the same for every iteration.
 
 	\end{enumerate}
 
@@ -367,31 +399,37 @@ that all of this is my own work.
 
 		\item Programming assignment
 		\item Knowing that certain points belong in a particular cluster, the k-means
-			algorithm could be represented by the following pseudo code:
+			algorithm could be altered to be: compute the centroid for the given set of
+			fixed points and begin the adjusted alternating minimization. Alternating
+			minimization would be performed much the same way except that, when
+			points are assigned to centroids, anything in the pinned set is skipped and
+			when centroids are created from point averages, the precomputed centroid
+			is skipped. In pseudo-code, this would look something like:
 
 			\begin{verbatim}
-				# Preprocess the points belonging to a particular cluster by
-				# finding the centroid between them
-				def bestCentroidForClusters:
-					for k clusters:
-						for e pinnedExamples:
-							# compute centroid, mark centroid as pinned
+# Preprocess the points belonging to a particular cluster by
+# finding the centroid between them
+def bestCentroidForClusters:
+	for k clusters:
+		for e pinnedExamples:
+			# compute centroid, mark centroid as pinned
+bestCentroidForClusters()
 
-				# Carry on computation as usual, skipping centroid assignment and movement
-				# for the pinned points
-				def assignPointsToCentroids:
-					for e examples:
-						if examples[e] is not pinned:
-						# business as usual, carry on
-				def bestCentroidForClusters:
-					for k clusters:
-						for e examples:
-							# compute centroid
-							if k is not pinned:
-								# Carry on computation as previously done
-				for i in range(maxIters):
-					assignPointsToCentroids()
-					bestCentroidForClusters()
+# Carry on computation as usual, skipping centroid assignment and movement
+# for the pinned points
+def assignPointsToCentroids:
+	for e examples:
+		if examples[e] is not pinned:
+		# normal computation proceeds
+def bestCentroidForClusters:
+	for k clusters:
+		if k is not pinned:
+			# Carry on computation as previously done
+			for e examples:
+				# compute centroid
+for i in maxIters:
+	assignPointsToCentroids()
+	bestCentroidForClusters()
 			\end{verbatim}
 	\end{enumerate}
 
