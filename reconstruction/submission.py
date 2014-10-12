@@ -18,7 +18,7 @@ class SegmentationProblem(util.SearchProblem):
 
 	def isGoal(self, state):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		return state == len(self.query) - 1
+		return state == len(self.query)
 		# END_YOUR_CODE
 
 	def succAndCost(self, state):
@@ -26,8 +26,8 @@ class SegmentationProblem(util.SearchProblem):
 		# BEGIN_YOUR_CODE (around 10 lines of code expected)
 		choices = []
 		q = self.query
-		for index, char in enumerate(q):
-			word = q[state:index] 
+		for index in range(1, len(q) + 1):
+			word = q[state:index]
 			choices.append((word, index, self.unigramCost(word)))
 		return choices
 		# END_YOUR_CODE
@@ -36,7 +36,7 @@ def segmentWords(query, unigramCost):
 	if len(query) == 0:
 		return ''
 
-	ucs = util.UniformCostSearch(verbose=1)
+	ucs = util.UniformCostSearch(verbose=3)
 	ucs.solve(SegmentationProblem(query, unigramCost))
 
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
