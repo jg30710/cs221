@@ -80,7 +80,7 @@ def repl(unigramCost, bigramCost, possibleFills, command=None):
 
         elif cmd == 'bg':
             grams = tuple(wordsegUtil.words(line))
-            prefix, ending = grams[:-1], grams[-1]
+            prefix, ending = grams[-2], grams[-1]
             print bigramCost(prefix, ending)
 
         else:
