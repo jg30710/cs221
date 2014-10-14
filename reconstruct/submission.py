@@ -162,12 +162,13 @@ class JointSegmentationInsertionProblemA(util.SearchProblem):
 		choices = []
 		q = self.query
 		currIndex = state
-		for index in range(currIndex + 1, len(q) + 1):
+		queryLength = len(q)
+		for index in range(currIndex + 1, queryLength + 1):
 			word = q[currIndex:index]
 			possibles = self.possibleFills(word)
 			for poss in possibles:
 				cost = self.bigramCost(poss)
-				choices.append((poss, index, cost))
+				choices.append((poss, index, cost + (queryLength - index)))
 		return choices
 		# END_YOUR_CODE
 
