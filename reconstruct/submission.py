@@ -132,8 +132,53 @@ def segmentAndInsert(query, bigramCost, possibleFills):
 		return ''
 
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	ucs = util.UniformCostSearch(verbose=0)
+	ucs = util.UniformCostSearch(verbose=3)
 	ucs.solve(JointSegmentationInsertionProblem(query, bigramCost, possibleFills))
+	return ' '.join(ucs.actions)
+	# END_YOUR_CODE
+
+############################################################
+# Problem 3b: Solve the joint segmentation-and-insertion problem
+
+class JointSegmentationInsertionProblemA(util.SearchProblem):
+	def __init__(self, query, bigramCost, possibleFills):
+		self.query = query
+		self.bigramCost = bigramCost
+		self.possibleFills = possibleFills
+
+	def startState(self):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		return (0, 0)
+		# END_YOUR_CODE
+
+	def isGoal(self, state):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		index = state[1]
+		return index >= len(self.query)
+		# END_YOUR_CODE
+
+	def succAndCost(self, state):
+		# BEGIN_YOUR_CODE (around 15 lines of code expected)
+		choices = []
+		q = self.query
+		prevWordCost = state[0]
+		currIndex = state[1]
+		for index in range(currIndex + 1, len(q) + 1):
+			word = q[currIndex:index]
+			possibles = self.possibleFills(word)
+			for poss in possibles:
+				cost = self.bigramCost(poss)
+				choices.append((poss, (cost, index), prevWordCost + cost))
+		return choices
+		# END_YOUR_CODE
+
+def segmentAndInsertA(query, bigramCost, possibleFills):
+	if len(query) == 0:
+		return ''
+
+	# BEGIN_YOUR_CODE (around 5 lines of code expected)
+	ucs = util.UniformCostSearch(verbose=3)
+	ucs.solve(JointSegmentationInsertionProblemA(query, bigramCost, possibleFills))
 	return ' '.join(ucs.actions)
 	# END_YOUR_CODE
 

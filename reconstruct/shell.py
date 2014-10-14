@@ -70,6 +70,17 @@ def repl(unigramCost, bigramCost, possibleFills, command=None):
                 for part in parts
             )
 
+        elif cmd == 'bothA':
+            line = wordsegUtil.cleanLine(line)
+            smoothCost = wordsegUtil.smoothUnigramAndBigram(unigramCost, bigramCost, 0.2)
+            parts = [wordsegUtil.removeAll(w, 'aeiou') for w in wordsegUtil.words(line)]
+            print '  Query (both):', ' '.join(parts)
+            print ''
+            print '  ' + ' '.join(
+                submission.segmentAndInsertA(part, unigramCost, possibleFills)
+                for part in parts
+            )
+
         elif cmd == 'fills':
             line = wordsegUtil.cleanLine(line)
             print '\n'.join(possibleFills(line))
