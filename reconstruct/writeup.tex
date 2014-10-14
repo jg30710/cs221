@@ -1,0 +1,123 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 3}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 1}
+
+\begin{enumerate}[label=(\alph*)]
+	\item The greedy algorithm, while it may, in certain circumstances,
+		find a solution, falls short in many others. Consider the
+		following sentence:
+
+		"the best theatrical performance happened here"
+
+		If the spaces were removed and we had:
+
+		"thebesttheatricalperformancehappenedhere"
+
+		The word "the" would be chosen first since its the smallest cost
+		word over the set (nothing else appended to "the" would form a word)
+		we would then continue the algorithm from:
+
+		"besttheatricalperformancehappenedhere"
+
+		Here's where the greedy algorithm breaks down. Two potential word
+		possibilities arise: "be" and "best". If the shorter word "be" is
+		weighted less and therefore chosen by the greedy algorithm
+		without further consideration, all words
+		chosen after would be neigher fluent nor cost effective.
+
+	\item Programming problem
+
+
+\end{enumerate}
+
+\section*{Problem 2}
+
+\begin{enumerate}[label=(\alph*)]
+	\item Considering the second greedy algorithm, involving vowel insertion,
+		the same shortfalls arise as with space insertion. For instance:
+
+		"the scare lifted"
+
+		Removing the vowels we have:
+		
+		"th scr lftd"
+
+		Again, the word "the" would likely be found since its the lowest-cost,
+		full word that can be made first, but when we arrive at "scr" this falls apart.
+		Should the shorter, lower-cost bigram("the", "scar") be chosen over
+		bigram("the", "scare"), we ensure that future bigrams are now more costly,
+		and the sentence loses its fluency.
+	
+	\item Programming problem
+
+\end{enumerate}
+
+\section*{Problem 3}
+
+\begin{enumerate}[label=(\alph*)]
+	\item To formalize this problem as a search problem the model can be
+		described as:
+
+		\begin{enumerate}
+			\item initial state: beginning of string
+			\item goal test: end of string reached
+			\item state: previous word and current index
+			\item actions: choosing words made from letters between current index and some
+				end point
+			\item costs: bigram cost between the previous and current word
+		\end{enumerate}
+
+		Using the bigram cost function, this is the minimal representation of state
+		since we must remember the previous word to compare against new words made
+		from the current index.
+	
+	\item Programming problem
+
+	\item In order to speed up joint space and vowel insertion using A*,
+		we can rework our model. The costly bigram function can be related
+		to the unigram one in the following way:
+		\[
+			b(w',w) \approx u(w) + u(w')
+		\]
+
+		and in terms of \(u(w)\):
+
+		\[
+			u(w) \approx b(w',w) - u(w')
+		\]
+
+		This should make sense in that the sum of unigram costs for two, successive
+		words that are fluent will be around the same value as their bigram that
+		scores their proximity (and expresses that same fluency). The original problem
+		can thus be solved using only the unigram cost (since the \(u(w')\) is
+		reflected in the past cost). This simpler algorithm is now quite similar to
+		the first problem of space insertion and works as such (but still occassionally
+		traverses paths away from the goal). After coming up with a heuristic, \(h_u\),
+		however, the simpler algorithm will
+		be appropriately penalized for moving away from its goal. One such
+		heuristic would be a simple difference between the query's length and
+		the index of the next state. The closer a word brings the index to the
+		end of the query, the less it is penalized cost-wise. The heuristic is consistent
+		because, at the goal state which is the end of the string, the difference
+		becomes \(0\) and its cost is always positive since any successor word
+		index will be less than or equal to the query's length.
+
+\end{enumerate}
+
+\end{document}
