@@ -68,9 +68,8 @@ class VowelInsertionProblem(util.SearchProblem):
 		# BEGIN_YOUR_CODE (around 10 lines of code expected)
 		# choices are triples (words, newState, cost)
 		choices = []
-		word = state[0]
-		afterWord = state[1]
-		nextIndex = state[2] + 1
+		word, afterWord, index = state
+		nextIndex = index + 1
 		possibles = self.possibleFills(afterWord)
 		# Handle case for a word with no vowel substitutions
 		possibles.add(afterWord)
@@ -117,8 +116,7 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
 		# BEGIN_YOUR_CODE (around 15 lines of code expected)
 		choices = []
 		q = self.query
-		prevWord = state[0]
-		currIndex = state[1]
+		prevWord, currIndex = state
 		for index in range(currIndex + 1, len(q) + 1):
 			word = q[currIndex:index]
 			possibles = self.possibleFills(word)
