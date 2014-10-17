@@ -7,15 +7,31 @@ import collections, util, math, random
 
 class ValueIteration(util.MDPAlgorithm):
 
-    # Implement value iteration.  First, compute V_opt using the methods 
-    # discussed in class.  Once you have computed V_opt, compute the optimal 
-    # policy pi.  Note that ValueIteration is an instance of util.MDPAlgrotithm, 
-    # which means you will need to set pi and V (see util.py).
-    def solve(self, mdp, epsilon=0.001):
-        mdp.computeStates()
-        # BEGIN_YOUR_CODE (around 15 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	# Implement value iteration.  First, compute V_opt using the methods 
+	# discussed in class.  Once you have computed V_opt, compute the optimal 
+	# policy pi.  Note that ValueIteration is an instance of util.MDPAlgrotithm, 
+	# which means you will need to set pi and V (see util.py).
+	def solve(self, mdp, epsilon=0.001):
+		mdp.computeStates()
+		# BEGIN_YOUR_CODE (around 15 lines of code expected)
+		gamma = .8
+		self.pi = {}
+		self.V = {state : 0 for state in mdp.states}
+		VPrevious = {state: float('inf') for state, val in self.V.items()}
+		def valueDifference():
+			return max(abs(self.V[s] - VPrevious[s]) for s, v in self.V.items())
+		while(valueDifference() > epsilon):
+			VPrevious = dict(self.V)
+			for s in mdp.states:
+				Qs = []
+				for a in mdp.actions(s):
+					Q = 0
+					for sPrime in mdp.succAndProbReward(s, a):
+						newState, prob, reward = sPrime
+						Q += prob * (reward + gamma * self.V[newState])
+					Qs.append( (Q, a) )
+				self.V[s], self.pi[s] = max(Qs)
+		# END_YOUR_CODE
         
 
 ############################################################
@@ -26,54 +42,54 @@ class ValueIteration(util.MDPAlgorithm):
 # counterexample by filling out this class and returning an alpha value in
 # counterexampleAlpha().
 class CounterexampleMDP(util.MDP):
-    def __init__(self):
-        # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	def __init__(self):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		raise Exception("Not implemented yet")
+		# END_YOUR_CODE
 
-    def startState(self):
-        # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	def startState(self):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		raise Exception("Not implemented yet")
+		# END_YOUR_CODE
 
-    # Return set of actions possible from |state|.
-    def actions(self, state):
-        # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	# Return set of actions possible from |state|.
+	def actions(self, state):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		raise Exception("Not implemented yet")
+		# END_YOUR_CODE
 
-    # Return a list of (newState, prob, reward) tuples corresponding to edges
-    # coming out of |state|.
-    def succAndProbReward(self, state, action):
-        # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	# Return a list of (newState, prob, reward) tuples corresponding to edges
+	# coming out of |state|.
+	def succAndProbReward(self, state, action):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		raise Exception("Not implemented yet")
+		# END_YOUR_CODE
 
-    def discount(self):
-        # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+	def discount(self):
+		# BEGIN_YOUR_CODE (around 5 lines of code expected)
+		raise Exception("Not implemented yet")
+		# END_YOUR_CODE
 
 def counterexampleAlpha():
-    # BEGIN_YOUR_CODE (around 5 lines of code expected)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+	# BEGIN_YOUR_CODE (around 5 lines of code expected)
+	raise Exception("Not implemented yet")
+	# END_YOUR_CODE
 
 ############################################################
 # Problem 3a
 
 class BlackjackMDP(util.MDP):
-    def __init__(self, cardValues, multiplicity, threshold, peekCost):
-        """
-        cardValues: array of card values for each card type
-        multiplicity: number of each card type
-        threshold: maximum total before going bust
-        peekCost: how much it costs to peek at the next card
-        """
-        self.cardValues = cardValues
-        self.multiplicity = multiplicity
-        self.threshold = threshold
-        self.peekCost = peekCost
+	def __init__(self, cardValues, multiplicity, threshold, peekCost):
+		"""
+		cardValues: array of card values for each card type
+		multiplicity: number of each card type
+		threshold: maximum total before going bust
+		peekCost: how much it costs to peek at the next card
+		"""
+		self.cardValues = cardValues
+		self.multiplicity = multiplicity
+		self.threshold = threshold
+		self.peekCost = peekCost
 
     # Return the start state.
     # Look at this function to learn about the state representation.
@@ -81,35 +97,35 @@ class BlackjackMDP(util.MDP):
     # hand.  The second element is the next card, if the player peeked in the
     # last action.  If they didn't peek, this will be None.  The final element
     # is the current deck.
-    def startState(self):
-        return (0, None, (self.multiplicity,) * len(self.cardValues))  # total, next card (if any), multiplicity for each card
+		def startState(self):
+			return (0, None, (self.multiplicity,) * len(self.cardValues))  # total, next card (if any), multiplicity for each card
 
     # Return set of actions possible from |state|.
-    def actions(self, state):
-        return ['Take', 'Peek', 'Quit']
+		def actions(self, state):
+			return ['Take', 'Peek', 'Quit']
 
     # Return a list of (newState, prob, reward) tuples corresponding to edges
     # coming out of |state|.  Indicate a terminal state (after quitting or
     # busting) by setting the deck to (0,).
-    def succAndProbReward(self, state, action):
-        # BEGIN_YOUR_CODE (around 55 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+		def succAndProbReward(self, state, action):
+			# BEGIN_YOUR_CODE (around 55 lines of code expected)
+			raise Exception("Not implemented yet")
+			# END_YOUR_CODE
 
-    def discount(self):
-        return 1
+		def discount(self):
+			return 1
 
 ############################################################
 # Problem 3b
 
 def peekingMDP():
-    """
-    Return an instance of BlackjackMDP where peeking is the optimal action at
-    least 10% of the time.
-    """
-    # BEGIN_YOUR_CODE (around 5 lines of code expected)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+	"""
+	Return an instance of BlackjackMDP where peeking is the optimal action at
+	least 10% of the time.
+	"""
+	# BEGIN_YOUR_CODE (around 5 lines of code expected)
+	raise Exception("Not implemented yet")
+	# END_YOUR_CODE
 
 ############################################################
 # Problem 4a: Q learning
@@ -121,50 +137,50 @@ def peekingMDP():
 # explorationProb: the epsilon value indicating how frequently the policy
 # returns a random action
 class QLearningAlgorithm(util.RLAlgorithm):
-    def __init__(self, actions, discount, featureExtractor, explorationProb=0.2):
-        self.actions = actions
-        self.discount = discount
-        self.featureExtractor = featureExtractor
-        self.explorationProb = explorationProb
-        self.weights = collections.Counter()
-        self.numIters = 0
+	def __init__(self, actions, discount, featureExtractor, explorationProb=0.2):
+		self.actions = actions
+		self.discount = discount
+		self.featureExtractor = featureExtractor
+		self.explorationProb = explorationProb
+		self.weights = collections.Counter()
+		self.numIters = 0
 
-    # Return the Q function associated with the weights and features
-    def getQ(self, state, action):
-        score = 0
-        for f, v in self.featureExtractor(state, action):
-            score += self.weights[f] * v
-        return score
+		# Return the Q function associated with the weights and features
+		def getQ(self, state, action):
+			score = 0
+			for f, v in self.featureExtractor(state, action):
+				score += self.weights[f] * v
+			return score
 
     # This algorithm will produce an action given a state.
     # Here we use the epsilon-greedy algorithm: with probability
     # |explorationProb|, take a random action.
-    def getAction(self, state):
-        self.numIters += 1
-        if random.random() < self.explorationProb:
-            return random.choice(self.actions(state))
-        else:
-            return max((self.getQ(state, action), action) for action in self.actions(state))[1]
+		def getAction(self, state):
+			self.numIters += 1
+			if random.random() < self.explorationProb:
+				return random.choice(self.actions(state))
+			else:
+				return max((self.getQ(state, action), action) for action in self.actions(state))[1]
 
     # Call this function to get the step size to update the weights.
-    def getStepSize(self):
-        return 1.0 / math.sqrt(self.numIters)
+		def getStepSize(self):
+			return 1.0 / math.sqrt(self.numIters)
 
     # We will call this function with (s, a, r, s'), which you should use to update |weights|.
     # Note that if s is a terminal state, then s' will be None.  Remember to check for this.
     # You should update the weights using self.getStepSize(); use
     # self.getQ() to compute the current estimate of the parameters.
-    def incorporateFeedback(self, state, action, reward, newState):
-        # BEGIN_YOUR_CODE (around 15 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+		def incorporateFeedback(self, state, action, reward, newState):
+			# BEGIN_YOUR_CODE (around 15 lines of code expected)
+			raise Exception("Not implemented yet")
+			# END_YOUR_CODE
 
 # Return a singleton list containing indicator feature for the (state, action)
 # pair.  Provides no generalization.
 def identityFeatureExtractor(state, action):
-    featureKey = (state, action)
-    featureValue = 1
-    return [(featureKey, featureValue)]
+	featureKey = (state, action)
+	featureValue = 1
+	return [(featureKey, featureValue)]
 
 ############################################################
 # Problem 4b: convergence of Q-learning
@@ -185,10 +201,10 @@ largeMDP = BlackjackMDP(cardValues=[1, 3, 5, 8, 10], multiplicity=3, threshold=4
 # - indicator on the presence/absence of each card and the action (1 feature).  Only add this feature if the deck != None
 # - indicator on the number of cards for each card type and the action (len(counts) features).  Only add these features if the deck != None
 def blackjackFeatureExtractor(state, action):
-    total, nextCard, counts = state
-    # BEGIN_YOUR_CODE (around 10 lines of code expected)
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+	total, nextCard, counts = state
+	# BEGIN_YOUR_CODE (around 10 lines of code expected)
+	raise Exception("Not implemented yet")
+	# END_YOUR_CODE
 
 ############################################################
 # Problem 4d: changing mdp
