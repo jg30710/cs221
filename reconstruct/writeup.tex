@@ -90,33 +90,51 @@ that all of this is my own work.
 	\item Programming problem
 
 	\item In order to speed up joint space and vowel insertion using A*,
-		we can rework our model. The costly bigram function can be related
-		to the unigram one in the following way:
+		we can enhance our successor choices with a heuristic. Computing
+		another bigram to find out the likelihood of the current guess
+		and the next word is expensive, so we need a good approximation
+		of the future cost.
+
+		One such approximation would be the unigram cost, \(h_u = u(w)\). This
+		is a much cheaper quantity to compute than a bigram. The cost of
+		our simpler, faster algorithm can be represented as:
 		\[
-			b(w',w) \approx u(w) + u(w')
+			\text{cost'} = b(w',w) + u(w)
 		\]
 
-		and in terms of \(u(w)\):
-
+		The question is now a matter of consistency. At our goal state,
+		which is the end of the string, \(u(w)\) evaluates to \(0\)
+		meeting one condition. The next issue to satisfy is the triangle
+		inequality, namely that:
 		\[
-			u(w) \approx b(w',w) - u(w')
+			\text{cost'}(s,a) = \text{cost}(s,a) + h(\text{Succ}(s,a)) - h(s) \geq 0
 		\]
+		holds true, which is, in our particular case:
+		\[
+			b(w',w) + u(w) - u(w') \geq 0
+		\]
+		Barring corner cases, the probablilities of each \(n\)-gram can be represented
+		as \(-\text{log}(p(w_n | w_1,...,w_{n-1}))\) which will be substituted into
+		our inequality:
+		\[
+			-\text{log}(p(w | w_1,...,w')) - log(p(w)) + log(p(w')) \geq 0
+		\]
+		and after moving terms around the inequality, converting the log difference
+		to a quotient and exponentiating we have:
+		\[
+			p(w | w_1,...,w') \leq \frac{p(w')}{p(w)}
+		\]
+		Some final manipulation yields:
+		\[
+			 0 \leq p(w') - p(w) \cdot p(w | w_1,...,w')
+		\]
+		Here we know that \(p(w | w_1,...,w') \leq p(w')\) since the left hand
+		quantity depends on \(w'\) and all previous probabilities and that
+		even if \(p(w)\) is as large as can be, we get at most identity in the
+		previous inequality. Thus since inequality is true for all \(w\)
+		and it was created from the consistency requirement, we know that
+		our heuristic \(u(w)\) is consistent.
 
-		This should make sense in that the sum of unigram costs for two, successive
-		words that are fluent will be around the same value as their bigram that
-		scores their proximity (and expresses that same fluency). The original problem
-		can thus be solved using only the unigram cost (since the \(u(w')\) is
-		reflected in the past cost). This simpler algorithm is now quite similar to
-		the first problem of space insertion and works as such (but still occassionally
-		traverses paths away from the goal). After coming up with a heuristic, \(h_u\),
-		however, the simpler algorithm will
-		be appropriately penalized for moving away from its goal. One such
-		heuristic would be a simple difference between the query's length and
-		the index of the next state. The closer a word brings the index to the
-		end of the query, the less it is penalized cost-wise. The heuristic is consistent
-		because, at the goal state which is the end of the string, the difference
-		becomes \(0\) and its cost is always positive since any successor word
-		index will be less than or equal to the query's length.
 
 \end{enumerate}
 
