@@ -14,7 +14,6 @@ class ValueIteration(util.MDPAlgorithm):
 	def solve(self, mdp, epsilon=0.001):
 		mdp.computeStates()
 		# BEGIN_YOUR_CODE (around 15 lines of code expected)
-		gamma = .8
 		self.pi = {}
 		self.V = {state : 0 for state in mdp.states}
 		VPrevious = {state: float('inf') for state, val in self.V.items()}
@@ -28,7 +27,7 @@ class ValueIteration(util.MDPAlgorithm):
 					Q = 0
 					for sPrime in mdp.succAndProbReward(s, a):
 						newState, prob, reward = sPrime
-						Q += prob * (reward + gamma * self.V[newState])
+						Q += prob * (reward + mdp.discount() * self.V[newState])
 					Qs.append( (Q, a) )
 				self.V[s], self.pi[s] = max(Qs)
 		# END_YOUR_CODE
@@ -91,29 +90,65 @@ class BlackjackMDP(util.MDP):
 		self.threshold = threshold
 		self.peekCost = peekCost
 
-    # Return the start state.
-    # Look at this function to learn about the state representation.
-    # The first element of the tuple is the sum of the cards in the player's
-    # hand.  The second element is the next card, if the player peeked in the
-    # last action.  If they didn't peek, this will be None.  The final element
-    # is the current deck.
-		def startState(self):
-			return (0, None, (self.multiplicity,) * len(self.cardValues))  # total, next card (if any), multiplicity for each card
+	# Return the start state.
+	# Look at this function to learn about the state representation.
+	# The first element of the tuple is the sum of the cards in the player's
+	# hand.  The second element is the next card, if the player peeked in the
+	# last action.  If they didn't peek, this will be None.  The final element
+	# is the current deck.
+	def startState(self):
+		return (0, None, (self.multiplicity,) * len(self.cardValues))  # total, next card (if any), multiplicity for each card
 
-    # Return set of actions possible from |state|.
-		def actions(self, state):
-			return ['Take', 'Peek', 'Quit']
+	# Return set of actions possible from |state|.
+	def actions(self, state):
+		return ['Take', 'Peek', 'Quit']
 
-    # Return a list of (newState, prob, reward) tuples corresponding to edges
-    # coming out of |state|.  Indicate a terminal state (after quitting or
-    # busting) by setting the deck to (0,).
-		def succAndProbReward(self, state, action):
-			# BEGIN_YOUR_CODE (around 55 lines of code expected)
-			raise Exception("Not implemented yet")
-			# END_YOUR_CODE
+	# Return a list of (newState, prob, reward) tuples corresponding to edges
+	# coming out of |state|.  Indicate a terminal state (after quitting or
+	# busting) by setting the deck to (0, None).
+	def succAndProbReward(self, state, action):
+		# BEGIN_YOUR_CODE (around 55 lines of code expected)
+		edges = []
+		total, nextCardIndex, multiplicityTuple = state
+		# Handle peeking twice
+		if action == 'Peek' and nextCardIndex is not None:
+			return edges
+		# Quit 
+		if action == 'Quit':
+			return edges.append( ((total, None, None), 1, total)  )
+		cardsLeft = sum([cards for cards in multiplicityTuple])
+		multiplicitySize = len(multiplicityTuple)
+		# Handle peek
+		if action == "Peek":
+			for index in range(multiplicitySize):
+				tupleCopy = ()
+				peeked = None
+				if multiplicityTuple[index] != 0:
+					tupleCopy = tuple(multiplicityTuple)
+					tupleCopy[index] -= 1
+					peeked = index
+				edges.append( ((newTotal, peeked, multiplicityTuple), 1/cardsLeft, -1 * self.peekCost) )
+		# Take
+		if action == "Take":
+			if cardsLeft == 0:
+				return edges.append( (total, None, None), 1, total)
+			for index in range(multiplicitySize):
+				tupleCopy = ()
+				if multiplicityTuple[index] == 0:
+					break;
+				tupleCopy = tuple(multiplicityTuple)
+				tupleCopy[index] -= 1
+				newTotal = total + self.cardValues[index]
+				if newTotal > self.threshold:
+					# Bust
+					edges.append( ((newTotal, None, None), 1/cardsLeft, 0) )
+				else:
+					edges.append( ((newTotal, None, tupleCopy), 1/cardsLeft, 0) )
+		return edges
+		# END_YOUR_CODE
 
-		def discount(self):
-			return 1
+	def discount(self):
+		return 1
 
 ############################################################
 # Problem 3b
