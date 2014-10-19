@@ -112,49 +112,50 @@ class BlackjackMDP(util.MDP):
 		total, nextCardIndex, multiplicityTuple = state
 		if multiplicityTuple is None:
 			return edges
-		# Handle peeking twice
-		if action == 'Peek' and nextCardIndex is not None:
-			return edges
 		# Quit 
 		if action == 'Quit':
 			edges.append( ((total, None, None), 1, total)  )
 			return edges
 		multiplicitySize = len(multiplicityTuple)
-		prob = 0
-		if multiplicitySize != 0:
-			prob = 1.0/multiplicitySize
+		cardsLeft = sum([counts for counts in multiplicityTuple])
+		if cardsLeft == 0:
+			return edges
 		# Handle peek
 		if action == "Peek":
+			# Handle peeking twice
+			if nextCardIndex is not None:
+				return edges
 			for index in range(multiplicitySize):
-				peeked = None
 				if multiplicityTuple[index] != 0:
-					peeked = index
-					edges.append( ((total, peeked, multiplicityTuple), prob, -1 * self.peekCost) )
+					prob = multiplicityTuple[index]/(cardsLeft * 1.0)
+					edges.append( ((total, index, multiplicityTuple), prob, -1 * self.peekCost) )
 		# Take
 		if action == "Take":
-			#print multiplicityTuple
-			#cardsLeft = sum([counts for counts in multiplicityTuple])
-			#print cardsLeft
-			#if cardsLeft == 0:
-				#return edges.append( (total, None, None), 1, total)
-			for index in range(multiplicitySize):
-				if multiplicityTuple[index] == 0:
-					break;
+			if nextCardIndex is not None:
+				newTotal = total + self.cardValues[nextCardIndex]
 				tupleCopy = ()
 				tupleCopy = list(multiplicityTuple)
-				tupleCopy[index] -= 1
+				tupleCopy[nextCardIndex] -= 1
 				tupleCopy = tuple(tupleCopy)
-				newTotal = total + self.cardValues[index]
-				# If there's nothing left
-				cardsLeft = sum([counts for counts in tupleCopy])
-				if cardsLeft == 0:
-					edges.append( ((newTotal, None, None), 1, newTotal) )
-					return edges
-				if newTotal > self.threshold:
-					# Bust
-					edges.append( ((newTotal, None, None), prob, 0) )
-				else:
-					edges.append( ((newTotal, None, tupleCopy), prob, 0) )
+				edges.append( ((newTotal, None, tupleCopy), 1, 0) )
+				return edges
+			for index in range(multiplicitySize):
+				prob = multiplicityTuple[index]/(cardsLeft * 1.0)
+				if multiplicityTuple[index] != 0:
+					tupleCopy = ()
+					tupleCopy = list(multiplicityTuple)
+					tupleCopy[index] -= 1
+					tupleCopy = tuple(tupleCopy)
+					newTotal = total + self.cardValues[index]
+					if newTotal > self.threshold:
+						# Bust
+						edges.append( ((newTotal, None, None), prob, 0) )
+					else:
+						if cardsLeft == 1:
+							# If there's nothing left after this draw
+							edges.append( ((newTotal, None, None), 1, newTotal) )
+						else:
+							edges.append( ((newTotal, None, tupleCopy), prob, 0) )
 		return edges
 		# END_YOUR_CODE
 
@@ -170,7 +171,9 @@ def peekingMDP():
 	least 10% of the time.
 	"""
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	raise Exception("Not implemented yet")
+	mdp = BlackjackMDP(cardValues=[3, 4, 17], multiplicity=4,
+                                   threshold=20, peekCost=1)
+	return mdp
 	# END_YOUR_CODE
 
 ############################################################
