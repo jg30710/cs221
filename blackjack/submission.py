@@ -110,40 +110,51 @@ class BlackjackMDP(util.MDP):
 		# BEGIN_YOUR_CODE (around 55 lines of code expected)
 		edges = []
 		total, nextCardIndex, multiplicityTuple = state
+		if multiplicityTuple is None:
+			return edges
 		# Handle peeking twice
 		if action == 'Peek' and nextCardIndex is not None:
 			return edges
 		# Quit 
 		if action == 'Quit':
-			return edges.append( ((total, None, None), 1, total)  )
-		cardsLeft = sum([cards for cards in multiplicityTuple])
+			edges.append( ((total, None, None), 1, total)  )
+			return edges
 		multiplicitySize = len(multiplicityTuple)
+		prob = 0
+		if multiplicitySize != 0:
+			prob = 1.0/multiplicitySize
 		# Handle peek
 		if action == "Peek":
 			for index in range(multiplicitySize):
-				tupleCopy = ()
 				peeked = None
 				if multiplicityTuple[index] != 0:
-					tupleCopy = tuple(multiplicityTuple)
-					tupleCopy[index] -= 1
 					peeked = index
-				edges.append( ((newTotal, peeked, multiplicityTuple), 1/cardsLeft, -1 * self.peekCost) )
+					edges.append( ((total, peeked, multiplicityTuple), prob, -1 * self.peekCost) )
 		# Take
 		if action == "Take":
-			if cardsLeft == 0:
-				return edges.append( (total, None, None), 1, total)
+			#print multiplicityTuple
+			#cardsLeft = sum([counts for counts in multiplicityTuple])
+			#print cardsLeft
+			#if cardsLeft == 0:
+				#return edges.append( (total, None, None), 1, total)
 			for index in range(multiplicitySize):
-				tupleCopy = ()
 				if multiplicityTuple[index] == 0:
 					break;
-				tupleCopy = tuple(multiplicityTuple)
+				tupleCopy = ()
+				tupleCopy = list(multiplicityTuple)
 				tupleCopy[index] -= 1
+				tupleCopy = tuple(tupleCopy)
 				newTotal = total + self.cardValues[index]
+				# If there's nothing left
+				cardsLeft = sum([counts for counts in tupleCopy])
+				if cardsLeft == 0:
+					edges.append( ((newTotal, None, None), 1, newTotal) )
+					return edges
 				if newTotal > self.threshold:
 					# Bust
-					edges.append( ((newTotal, None, None), 1/cardsLeft, 0) )
+					edges.append( ((newTotal, None, None), prob, 0) )
 				else:
-					edges.append( ((newTotal, None, tupleCopy), 1/cardsLeft, 0) )
+					edges.append( ((newTotal, None, tupleCopy), prob, 0) )
 		return edges
 		# END_YOUR_CODE
 
