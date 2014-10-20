@@ -41,12 +41,10 @@ class ValueIteration(util.MDPAlgorithm):
 # counterexample by filling out this class and returning an alpha value in
 # counterexampleAlpha().
 class CounterexampleMDP(util.MDP):
-	def __init__(self, n, noisy):
+	def __init__(self, n):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		self.n = n
-		self.modifier = 0
-		if noisy:
-			self.modifier = counterexampleAlpha()
+		# Defaulting this value to 5
+		self.n = 5
 		# END_YOUR_CODE
 
 	def startState(self):
@@ -65,10 +63,6 @@ class CounterexampleMDP(util.MDP):
 	def succAndProbReward(self, state, action):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
 		T = [0.4, 0.6]
-		if self.modifier != 0:
-			allProbs = sum([prob + self.modifier for prob in T])
-			T[0] = (T[0] + self.modifier)/allProbs
-			T[1] = (T[1] + self.modifier)/allProbs
 		return [(state, T[1], 0),
 				(min(max(state + action, -self.n), +self.n), T[0], state)]
 		# END_YOUR_CODE
@@ -212,35 +206,44 @@ class QLearningAlgorithm(util.RLAlgorithm):
 		self.weights = collections.Counter()
 		self.numIters = 0
 
-		# Return the Q function associated with the weights and features
-		def getQ(self, state, action):
-			score = 0
-			for f, v in self.featureExtractor(state, action):
-				score += self.weights[f] * v
-			return score
+	# Return the Q function associated with the weights and features
+	def getQ(self, state, action):
+		score = 0
+		for f, v in self.featureExtractor(state, action):
+			score += self.weights[f] * v
+		return score
 
-    # This algorithm will produce an action given a state.
-    # Here we use the epsilon-greedy algorithm: with probability
-    # |explorationProb|, take a random action.
-		def getAction(self, state):
-			self.numIters += 1
-			if random.random() < self.explorationProb:
-				return random.choice(self.actions(state))
-			else:
-				return max((self.getQ(state, action), action) for action in self.actions(state))[1]
+	# This algorithm will produce an action given a state.
+	# Here we use the epsilon-greedy algorithm: with probability
+	# |explorationProb|, take a random action.
+	def getAction(self, state):
+		self.numIters += 1
+		if random.random() < self.explorationProb:
+			return random.choice(self.actions(state))
+		else:
+			return max((self.getQ(state, action), action) for action in self.actions(state))[1]
 
-    # Call this function to get the step size to update the weights.
-		def getStepSize(self):
-			return 1.0 / math.sqrt(self.numIters)
+	# Call this function to get the step size to update the weights.
+	def getStepSize(self):
+		return 1.0 / math.sqrt(self.numIters)
 
-    # We will call this function with (s, a, r, s'), which you should use to update |weights|.
-    # Note that if s is a terminal state, then s' will be None.  Remember to check for this.
-    # You should update the weights using self.getStepSize(); use
-    # self.getQ() to compute the current estimate of the parameters.
-		def incorporateFeedback(self, state, action, reward, newState):
-			# BEGIN_YOUR_CODE (around 15 lines of code expected)
-			raise Exception("Not implemented yet")
-			# END_YOUR_CODE
+	# We will call this function with (s, a, r, s'), which you should use to update |weights|.
+	# Note that if s is a terminal state, then s' will be None.  Remember to check for this.
+	# You should update the weights using self.getStepSize(); use
+	# self.getQ() to compute the current estimate of the parameters.
+	def incorporateFeedback(self, state, action, reward, newState):
+		# BEGIN_YOUR_CODE (around 15 lines of code expected)
+		residual = 0
+		if newState is None:
+			residual = reward - self.getQ(state, action)
+		else:
+			residual = reward + \
+				self.discount * max([self.getQ(newState, newAction) for newAction in self.actions(state)]) - \
+				self.getQ(state, action)
+		features = self.featureExtractor(state, action) # list of (feature name, feature value)
+		for key, val in features:
+			self.weights[key] = self.weights[key]	+ self.getStepSize() * residual * val
+		# END_YOUR_CODE
 
 # Return a singleton list containing indicator feature for the (state, action)
 # pair.  Provides no generalization.
