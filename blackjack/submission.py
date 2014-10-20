@@ -41,38 +41,56 @@ class ValueIteration(util.MDPAlgorithm):
 # counterexample by filling out this class and returning an alpha value in
 # counterexampleAlpha().
 class CounterexampleMDP(util.MDP):
-	def __init__(self):
+	def __init__(self, n, noisy):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		raise Exception("Not implemented yet")
+		self.n = n
+		self.modifier = 0
+		if noisy:
+			self.modifier = counterexampleAlpha()
 		# END_YOUR_CODE
 
 	def startState(self):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		raise Exception("Not implemented yet")
+		return 0
 		# END_YOUR_CODE
 
 	# Return set of actions possible from |state|.
 	def actions(self, state):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		raise Exception("Not implemented yet")
+		return [-1, 1]
 		# END_YOUR_CODE
 
 	# Return a list of (newState, prob, reward) tuples corresponding to edges
 	# coming out of |state|.
 	def succAndProbReward(self, state, action):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		raise Exception("Not implemented yet")
+		T = [0.4, 0.6]
+		if self.modifier != 0:
+			allProbs = sum([prob + self.modifier for prob in T])
+			T[0] = (T[0] + self.modifier)/allProbs
+			T[1] = (T[1] + self.modifier)/allProbs
+		return [(state, T[1], 0),
+				(min(max(state + action, -self.n), +self.n), T[0], state)]
 		# END_YOUR_CODE
 
 	def discount(self):
 		# BEGIN_YOUR_CODE (around 5 lines of code expected)
-		raise Exception("Not implemented yet")
+		return 0.9
 		# END_YOUR_CODE
 
 def counterexampleAlpha():
 	# BEGIN_YOUR_CODE (around 5 lines of code expected)
-	raise Exception("Not implemented yet")
+	return 1
 	# END_YOUR_CODE
+
+# Test stuff for counter example
+#alg = ValueIteration()
+## Norm
+#alg.solve(CounterexampleMDP(2, False), .0001)
+#print alg.V
+#alg = ValueIteration()
+#alg.solve(CounterexampleMDP(2, True), .0001)
+#print alg.V
 
 ############################################################
 # Problem 3a
