@@ -273,7 +273,15 @@ largeMDP = BlackjackMDP(cardValues=[1, 3, 5, 8, 10], multiplicity=3, threshold=4
 def blackjackFeatureExtractor(state, action):
 	total, nextCard, counts = state
 	# BEGIN_YOUR_CODE (around 10 lines of code expected)
-	raise Exception("Not implemented yet")
+	extractor = []
+	extractor.append(((total, action), 1))
+	if counts is not None:
+		presenceKey = (tuple(1 if c > 0 else 0 for c in counts), action)
+		extractor.append( (presenceKey, 1) )
+		for index, count in enumerate(counts):
+			# number of card per type and action
+			extractor.append( ((index, count, action), 1) )
+	return extractor
 	# END_YOUR_CODE
 
 ############################################################
