@@ -1,0 +1,91 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\title{Homework 4}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 4}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 1}
+
+\begin{enumerate}[label=(\alph*)]
+	\item From the given items, we compute \(V_{opt}\) according to the following:
+		\[
+			V_{opt}^{t}(s) = \text{max}_{a \in \text{actions}} \sum_{s'} T(s,a,s')
+			\left[ \text{Reward}(s,a,s') + \gamma V_{opt}^{t-1}(s') \right]
+		\]
+		Substituting the given values into the equation we have for the first
+		iteration:
+		\[
+			V_{opt}(0) = \text{max}_{a \in \{-1, 1\}}
+				\{(0.8(-5 + 0) + 0.2(-5 + 0)),
+				(0.7(-5 + 0) + 0.3(-5 + 0))\}
+				= -5
+		\]
+		Then the second:
+		\[
+			V_{opt}(-1) = \text{max}_{a \in \{-1, 1\}}
+				\{(0.8(20 - 5) + 0.2(-5 - 5)),
+				(0.7(20 - 5) + 0.3(-5 - 5))\}
+				= 10
+		\]
+		\[
+			V_{opt}(1) = \text{max}_{a \in \{-1, 1\}}
+				\{(0.8(-5 - 5) + 0.2(100 - 5)),
+				(0.7(-5 - 5) + 0.3(100 - 5))\}
+				= 21.5
+		\]
+		From this, the resulting policy is that we should choose to go to state \(s+1\).
+
+\end{enumerate}
+
+\section*{Problem 4}
+
+\begin{enumerate}[label=(\alph*)]
+	\item Programming problem
+
+	\item The results from running ValueIteration and simulate using the
+		identityFeatureExtractor was that identityFeatureExtractor
+		differed in actions about \(16.7\%\) of the time. After
+		running the test again with the largeMDP, the difference
+		reduced slightly, but the identityFeatureExtractor policy
+		only utilized the "Take" action.
+
+		This stands to reason in that the identityFeatureExtractor is naive
+		and doesn't incorporate domain knowledge about the game so it
+		won't find the utility in "Quit" or "Peek" actions.
+
+
+	\item Programming problem
+
+	\item After computing an optimal policy and applying that policy to the
+		newThresholdMDP using simulate with FixedRLAlgorithm, the resulting
+		reward is \(10\) as compared to Q-learning's reward of \(12\). This
+		result is quite intuitive and speaks to the advantage of Q-learning
+		--Q-learning does just that, learns without knowing about the
+		specific problem a priori allowing it to best ValueIteration's optimal
+		policy. To elaborate, when ValueIteration generates
+		a policy off of the originalMDP, it is optimizing according to the
+		original threshold of \(10\) and when the threshold changes to \(15\)
+		that policy will continue to avoid busting at the threshold of \(10\)
+		which is too conservative given the new threshold of \(15\).
+
+		In short, while ValueIteration can determine an optimal policy for
+		an MDP, that policy is not optimal when applied to MDPs
+		of differing parameters, a new policy must be generated. Q-learning
+		is obviously adaptable and handles changes over MDP parameters.
+
+\end{enumerate}
+
+\end{document}
