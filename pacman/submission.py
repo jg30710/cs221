@@ -163,8 +163,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
 		def recurse(gameState, depth):
 			# Base case
 			if gameState.isWin() or gameState.isLose():
-				return (gameState.getScore(), None)
 				# Return the utility
+				return (gameState.getScore(), None)
 			# List of choices for enemy agents by index
 			ghostChoices = []
 			for agentIndex in range(numAgents):
@@ -173,17 +173,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
 				legalActions = gameState.getLegalActions(agentIndex)
 				if depth == self.depth:
 					# Max depth reached, call eval function
-					choices = [(self.evaluationFunction(gameState, action), action) \
+					choices = [(self.evaluationFunction(gameState), action) \
 							for action in legalActions if action != Directions.STOP]
 				else:
 					choices = [(recurse(gameState \
 							.generateSuccessor(agentIndex, action), depth + 1), action) \
 							for action in legalActions if action != Directions.STOP]
-					if agentIndex == 0: # We're pacman
-						return max(choices)
-					else:
-						ghostChoices.append(choices)
-			return min(ghostChoices)
+				if agentIndex == 0: # We're pacman
+					return max(choices)
+				else:
+					ghostChoices.append(choices)
+			if len(ghostChoices) != 0:
+				return min(ghostChoices)
 		return recurse(gameState, 0)[1]
 		# END_YOUR_CODE
 
