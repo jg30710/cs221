@@ -205,7 +205,49 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 		"""
 
 		# BEGIN_YOUR_CODE (around 50 lines of code expected)
-		raise Exception("Not implemented yet")
+		numAgents = gameState.getNumAgents()
+		alpha = 0.0
+		beta = float("-inf")
+		def recurse(gameState, agent, depth, alpha):
+			# Base case
+			if gameState.isWin() or gameState.isLose():
+				# Return the utility
+				return (gameState.getScore(), None)
+			# choices is a list of (score, action) tuples
+			legalActions = gameState.getLegalActions(agent)
+			choices = []
+			if depth == 0:
+				# Max depth reached, call eval function
+				choices = [(self.evaluationFunction(gameState), action) \
+						for action in legalActions if action != Directions.STOP]
+			else:
+				# Only advance the depth once ALL agents have gone through
+				# Probably could have been clever with modulus, but I'd rather
+				# be explicit and clear than clever
+				if agent != numAgents -1:
+					nextAgent = agent + 1
+				else:
+					nextAgent = 0
+					depth -= 1
+				for action in legalActions:
+					if action != Directions.STOP:
+						beta = recurse(gameState.generateSuccessor(agent, action), \
+								nextAgent, depth, alpha)[0]
+						if agent == self.index:
+							choices.append( (beta, action) )
+						else:
+							if beta > alpha:
+								alpha = beta
+								choices.append( (beta, action) )
+							else:
+								return (alpha, action)
+			if agent == self.index: # We're pacman
+				return max(choices)
+			else:
+				return min(choices)
+		mini = recurse(gameState, self.index, self.depth, alpha)
+		print mini
+		return mini[1]
 		# END_YOUR_CODE
 
 ######################################################################################
