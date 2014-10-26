@@ -168,7 +168,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 			# choices is a list of (score, action) tuples
 			legalActions = gameState.getLegalActions(agent)
 			choices = []
-			if depth == self.depth:
+			if depth == 0:
 				# Max depth reached, call eval function
 				choices = [(self.evaluationFunction(gameState), action) \
 						for action in legalActions if action != Directions.STOP]
@@ -181,7 +181,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 					nextAgent = agent + 1
 				else:
 					nextAgent = 0
-					nextDepth += 1
+					nextDepth -= 1
 				choices = [(recurse(gameState \
 						.generateSuccessor(agent, action), nextAgent, nextDepth)[0], \
 						action) for action in legalActions if action != Directions.STOP]
@@ -189,7 +189,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 				return max(choices)
 			else:
 				return min(choices)
-		return recurse(gameState, self.index, 0) [1]
+		return recurse(gameState, self.index, self.depth)[1]
 		# END_YOUR_CODE
 
 ######################################################################################
