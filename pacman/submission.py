@@ -160,37 +160,40 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
 		# BEGIN_YOUR_CODE (around 30 lines of code expected)
 		numAgents = gameState.getNumAgents()
-		def recurse(gameState, depth):
+		def recurse(gameState, agent, depth):
 			# Base case
 			if gameState.isWin() or gameState.isLose():
 				# Return the utility
 				return (gameState.getScore(), None)
-			# List of choices for enemy agents by index
-			ghostChoices = []
-			for agentIndex in range(numAgents):
-				# choices is a list of (score, action) tuples
-				choices = []
-				legalActions = gameState.getLegalActions(agentIndex)
-				if depth == self.depth:
-					# Max depth reached, call eval function
-					choices = [(self.evaluationFunction(gameState), action) \
-							for action in legalActions if action != Directions.STOP]
+			# choices is a list of (score, action) tuples
+			legalActions = gameState.getLegalActions(agent)
+			choices = []
+			if depth == self.depth:
+				# Max depth reached, call eval function
+				choices = [(self.evaluationFunction(gameState), action) \
+						for action in legalActions if action != Directions.STOP]
+			else:
+				# Only advance the depth once ALL agents have gone through
+				nextDepth = depth
+				# Probably could have been clever with modulus, but I'd rather
+				# be explicit and clear than clever
+				if agent != numAgents -1:
+					nextAgent = agent + 1
 				else:
-					choices = [(recurse(gameState \
-							.generateSuccessor(agentIndex, action), depth + 1), action) \
-							for action in legalActions if action != Directions.STOP]
-				if agentIndex == 0: # We're pacman
-					return max(choices)
-				else:
-					ghostChoices.append(choices)
-			if len(ghostChoices) != 0:
-				return min(ghostChoices)
-		return recurse(gameState, 0)[1]
+					nextAgent = 0
+					nextDepth += 1
+				choices = [(recurse(gameState \
+						.generateSuccessor(agent, action), nextAgent, nextDepth)[0], \
+						action) for action in legalActions if action != Directions.STOP]
+			if agent == self.index: # We're pacman
+				return max(choices)
+			else:
+				return min(choices)
+		return recurse(gameState, self.index, 0) [1]
 		# END_YOUR_CODE
 
 ######################################################################################
 # Problem 2a: implementing alpha-beta
-
 class AlphaBetaAgent(MultiAgentSearchAgent):
 	"""
 		Your minimax agent with alpha-beta pruning (problem 2)
