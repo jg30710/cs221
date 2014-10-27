@@ -271,7 +271,44 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 		"""
 
 		# BEGIN_YOUR_CODE (around 25 lines of code expected)
-		raise Exception("Not implemented yet")
+		numAgents = gameState.getNumAgents()
+		def recurse(gameState, agent, depth):
+			# Base case
+			if gameState.isWin() or gameState.isLose():
+				# Return the utility
+				return (gameState.getScore(), None)
+			# choices is a list of (score, action) tuples
+			legalActions = gameState.getLegalActions(agent)
+			numActions = len(legalActions)
+			choices = []
+			randomActionChoiceProb = 1/numActions if numActions != 0 else 1
+			ghostScoreSum = 0
+			if depth == 0:
+				# Max depth reached, call eval function
+				choices = [(self.evaluationFunction(gameState), action) \
+						for action in legalActions if action != Directions.STOP]
+			else:
+				# Only decrement the depth once ALL agents have gone through
+				nextDepth = depth
+				if agent != numAgents -1:
+					nextAgent = agent + 1
+				else:
+					nextAgent = 0
+					nextDepth -= 1
+				for action in legalActions:
+					if action != Directions.STOP:
+						score = recurse(gameState \
+								.generateSuccessor(agent, action), nextAgent, nextDepth)[0]
+						if agent != self.index:
+							score *= randomActionChoiceProb
+							ghostScoreSum += score
+						else:
+							choices.append( (score, action) )
+			if agent == self.index: # We're pacman
+				return max(choices)
+			else:
+				return (ghostScoreSum, random.choice(legalActions))
+		return recurse(gameState, self.index, self.depth)[1]
 		# END_YOUR_CODE
 
 ######################################################################################
