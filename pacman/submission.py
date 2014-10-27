@@ -244,15 +244,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 								# New lower bound
 								beta = score
 							if not overlap(alpha, beta):
-								return (alpha, action)
+								# No trivial overlap
+								return (beta, action)
 							choices.append( (score, action) )
 			if agent == self.index: # We're pacman
 				return max(choices)
 			else:
 				return min(choices)
-		mini = recurse(gameState, self.index, self.depth, alpha, beta)
-		print mini
-		return mini[1]
+		return recurse(gameState, self.index, self.depth, alpha, beta)[1]
 		# END_YOUR_CODE
 
 ######################################################################################
