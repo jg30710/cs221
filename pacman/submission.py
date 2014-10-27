@@ -206,9 +206,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
 		# BEGIN_YOUR_CODE (around 50 lines of code expected)
 		numAgents = gameState.getNumAgents()
-		alpha = 0.0
-		beta = float("-inf")
-		def recurse(gameState, agent, depth, alpha):
+		alpha = float("-inf")
+		beta = float("inf")
+		def overlap(a, b):
+			return b > a
+		def recurse(gameState, agent, depth, alpha, beta):
 			# Base case
 			if gameState.isWin() or gameState.isLose():
 				# Return the utility
@@ -231,21 +233,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 					depth -= 1
 				for action in legalActions:
 					if action != Directions.STOP:
-						beta = recurse(gameState.generateSuccessor(agent, action), \
-								nextAgent, depth, alpha)[0]
+						score = recurse(gameState.generateSuccessor(agent, action), \
+								nextAgent, depth, alpha, beta)[0]
 						if agent == self.index:
-							choices.append( (beta, action) )
+							if score > alpha:
+								alpha = score
+							choices.append( (score, action) )
 						else:
-							if beta > alpha:
-								alpha = beta
-								choices.append( (beta, action) )
-							else:
+							if score < beta:
+								# New lower bound
+								beta = score
+							if not overlap(alpha, beta):
 								return (alpha, action)
+							choices.append( (score, action) )
 			if agent == self.index: # We're pacman
 				return max(choices)
 			else:
 				return min(choices)
-		mini = recurse(gameState, self.index, self.depth, alpha)
+		mini = recurse(gameState, self.index, self.depth, alpha, beta)
 		print mini
 		return mini[1]
 		# END_YOUR_CODE
