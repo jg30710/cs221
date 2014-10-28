@@ -285,8 +285,13 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 			ghostScoreSum = 0
 			if depth == 0:
 				# Max depth reached, call eval function
-				choices = [(self.evaluationFunction(gameState), action) \
-						for action in legalActions if action != Directions.STOP]
+				for action in legalActions:
+					if action != Directions.STOP:
+						score = self.evaluationFunction(gameState)
+						if agent != self.index:
+							score *= randomActionChoiceProb
+							ghostScoreSum += score
+						choices.append( (score, action) )
 			else:
 				# Only decrement the depth once ALL agents have gone through
 				nextDepth = depth
