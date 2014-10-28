@@ -26,18 +26,18 @@ that all of this is my own work.
 		when that depth is met in which case max or min is called on
 		\(\text{Eval}(s)\). In notation:
 		\[
-			V(s,d) = 
+			V_{opt}(s,d) = 
 			\begin{cases}
 				\text{Utility}(s), & \text{IsEnd}(s)\\
-				\text{max}_{a \in \text{actions}} V_{opt}(\text{Succ}(s,a), d), &
+				\text{max}_{a \in \text{Action(s)}} V_{opt}(\text{Succ}(s,a), d), &
 					\text{Player}(s) = a_0\\
-				\text{min}_{a \in \text{actions}} V_{opt}(\text{Succ}(s,a), d), &
+				\text{min}_{a \in \text{Action(s)}} V_{opt}(\text{Succ}(s,a), d), &
 					\text{Player}(s) = a_1..a_{n-1}\\
-				\text{min}_{a \in \text{actions}} V_{opt}(\text{Succ}(s,a), d-1), &
+				\text{min}_{a \in \text{Action(s)}} V_{opt}(\text{Succ}(s,a), d-1), &
 					\text{Player}(s) = a_n\\
-				\text{max}_{a \in \text{actions}} \text{Eval}(s), &
+				\text{max}_{a \in \text{Action(s)}} \text{Eval}(s), &
 					Player(s) = a_0 \text{ and } d = 0\\
-				\text{min}_{a \in \text{actions}} \text{Eval}(s), &
+				\text{min}_{a \in \text{Action(s)}} \text{Eval}(s), &
 					Player(s) = a_1..a_n \text{ and } d = 0\\
 			\end{cases}
 		\]
@@ -46,7 +46,28 @@ that all of this is my own work.
 \section*{Problem 3}
 
 \begin{enumerate}[label=(\alph*)]
-	\item Empty
+	\item Similar to the mutli-agent problem, we update the recurrence to
+		handle multiple agents, but this time with random motion. In this
+		case, the expectimax computation requires that we average the legal
+		moves (since all legal directions are equally likely) and that
+		we sum the product of that average with the value of \(V_{opt, \pi}\).
+		In notation:
+		\[
+			V_{opt, \pi}(s) = 
+			\begin{cases}
+				\text{Utility}(s), & \text{IsEnd}(s)\\
+				\text{max}_{a \in \text{Action(s)}} V_{opt, \pi}(\text{Succ}(s,a), d), &
+					\text{Player}(s) = a_0\\
+				\sum_{a \in \text{Action(s)}} \pi_{opt} V_{opt, \pi}(\text{Succ}(s,a), d), &
+					\text{Player}(s) = a_1..a_{n-1}\\
+				\sum_{a \in \text{Action(s)}} \pi_{opt} V_{opt, \pi}(\text{Succ}(s,a), d - 1), &
+					\text{Player}(s) = a_n\\
+				\text{max}_{a \in \text{Action(s)}} \text{Eval}(s), &
+					Player(s) = a_0 \text{ and } d = 0\\
+				\sum_{a \in \text{Action(s)}} \pi_{opt} \text{Eval}(s), &
+					Player(s) = a_1..a_n \text{ and } d = 0\\
+			\end{cases}
+		\]
 \end{enumerate}
 
 \end{document}
