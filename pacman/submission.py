@@ -170,8 +170,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
 			choices = []
 			if depth == 0:
 				# Max depth reached, call eval function
-				choices = [(self.evaluationFunction(gameState), action) \
-						for action in legalActions if action != Directions.STOP]
+				choices = [(self.evaluationFunction(gameState.generateSuccessor(agent, action)), \
+						action) for action in legalActions if action != Directions.STOP]
 			else:
 				# Only advance the depth once ALL agents have gone through
 				nextDepth = depth
@@ -220,8 +220,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 			choices = []
 			if depth == 0:
 				# Max depth reached, call eval function
-				choices = [(self.evaluationFunction(gameState), action) \
-						for action in legalActions if action != Directions.STOP]
+				choices = [(self.evaluationFunction(gameState.generateSuccessor(agent, action)), \
+						action) for action in legalActions if action != Directions.STOP]
 			else:
 				# Only advance the depth once ALL agents have gone through
 				# Probably could have been clever with modulus, but I'd rather
@@ -281,13 +281,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 			legalActions = gameState.getLegalActions(agent)
 			numActions = len(legalActions)
 			choices = []
-			randomActionChoiceProb = 1/numActions if numActions != 0 else 1
+			randomActionChoiceProb = 1/(numActions * 1.0) if numActions != 0 else 1
 			ghostScoreSum = 0
 			if depth == 0:
 				# Max depth reached, call eval function
 				for action in legalActions:
 					if action != Directions.STOP:
-						score = self.evaluationFunction(gameState)
+						score = self.evaluationFunction(gameState\
+								.generateSuccessor(agent, action))
 						if agent != self.index:
 							score *= randomActionChoiceProb
 							ghostScoreSum += score
@@ -303,7 +304,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 				for action in legalActions:
 					if action != Directions.STOP:
 						score = recurse(gameState \
-								.generateSuccessor(agent, action), nextAgent, nextDepth)[0]
+								.generateSuccessor(agent, action), nextAgent, nextDepth)
+						score = score[0]
 						if agent != self.index:
 							score *= randomActionChoiceProb
 							ghostScoreSum += score
@@ -313,6 +315,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 				return max(choices)
 			else:
 				return (ghostScoreSum, random.choice(legalActions))
+		
 		return recurse(gameState, self.index, self.depth)[1]
 		# END_YOUR_CODE
 
@@ -328,7 +331,102 @@ def betterEvaluationFunction(currentGameState):
 	"""
 
 	# BEGIN_YOUR_CODE (around 30 lines of code expected)
-	raise Exception("Not implemented yet")
+	# Useful information you can extract from a GameState (pacman.py)
+	"""
+		One idea for playing the game of pacman (as I see it) is to
+		create a quantity I'm affectionately referring to as momentum.
+		In general, when playing the game, I continue in a direction
+		unless acted on by another force (hit wall, ghost coming for
+		attack). That said, one of the best ways to clear the board
+		is to just continue in a direction until acted upon
+		by some agent or boundary.
+	"""
+	walls = currentGameState.getWalls()
+	width = walls.width
+	height = walls.height
+	def distanceToFood(pos):
+		distance = float('inf')
+		for x in range(width):
+			for y in range(height):
+				if currentGameState.hasFood(x, y):
+					md = manhattanDistance((x,y), pos)
+					if md < distance:
+						distance = md
+		return distance
+
+	def getFoodInDirection(pos, direction):
+		start = [pos[0], pos[1]]
+		end = [0, 0]
+		if direction is "North":
+			start = [0, pos[1]]
+			end = [width, height]
+		elif direction is "South":
+			start = [0, pos[1]]
+			end = [width, 0]
+		elif direction is "East":
+			start = [pos[0], 0]
+			end = [width, height]
+		elif direction is "West":
+			start = [pos[0], 0]
+			end = [0, height]
+		else:
+			start = [0, 0]
+			end = [width, height]
+		count = 0
+		totalFood = currentGameState.getNumFood()
+		for x in range(start[0], end[0]):
+			for y in range(start[1], end[1]):
+				if currentGameState.hasFood(x, y):
+					count += 1
+		totalFood = totalFood if totalFood != 0 else -1
+		# Returns the percentage of food in a given direction
+		return count/(totalFood * 1.0)
+
+	def flattenAndBias(pos, direction):
+		foodArr = currentGameState.getFood()
+		if direction == "East" or direction == "West":
+			colSums = [0] * width
+			for x in range(width):
+				for y in range(height):
+					if foodArr[x][y]:
+						colSums[x] += 1
+			westSum = sum(colSums[0:pos[0]])
+			eastSum = sum(colSums[pos[0]:width])
+			if westSum > eastSum and direction == "West":
+				return 200
+			if westSum < eastSum and direction == "East":
+				return 200
+			return -200
+		if direction == "North" or direction == "South":
+			rowSums = [0] * height
+			for y in range(height):
+				for x in range(width):
+					if foodArr[x][y]:
+						rowSums[y] += 1
+			northSum = sum(rowSums[pos[1]:height])
+			southSum = sum(rowSums[0:pos[1]])
+			if northSum > southSum and direction == "North":
+				return 200
+			if northSum < southSum and direction == "South":
+				return 200
+			return -200
+
+	# Current pacman state
+	pacmanState = currentGameState.getPacmanState()
+	pacmanCurrPos = pacmanState.getPosition()
+	pacmanCurrDir = pacmanState.getDirection()
+	score = currentGameState.getScore()
+	foodDirScore = getFoodInDirection(pacmanCurrPos, pacmanCurrDir)
+	foodDirScore *= 0.3 * 20
+	#fab = flattenAndBias(pacmanCurrPos, pacmanCurrDir)
+	dtf = distanceToFood(pacmanCurrPos)
+	if dtf == 0:
+		dtf = 1
+	dtf *= 1/dtf * 0.6 * 200
+
+	total = dtf + foodDirScore + score 
+
+	return total
 	# END_YOUR_CODE
 
 # Abbreviation
