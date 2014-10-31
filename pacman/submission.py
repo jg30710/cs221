@@ -304,19 +304,21 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 				for action in legalActions:
 					if action != Directions.STOP:
 						score = recurse(gameState \
-								.generateSuccessor(agent, action), nextAgent, nextDepth)
-						score = score[0]
+								.generateSuccessor(agent, action), nextAgent, nextDepth)[0]
 						if agent != self.index:
 							score *= randomActionChoiceProb
 							ghostScoreSum += score
 						else:
 							choices.append( (score, action) )
 			if agent == self.index: # We're pacman
+				random.shuffle(choices)
 				return max(choices)
 			else:
 				return (ghostScoreSum, random.choice(legalActions))
 		
-		return recurse(gameState, self.index, self.depth)[1]
+		mini = recurse(gameState, self.index, self.depth)
+		print mini
+		return mini[1]
 		# END_YOUR_CODE
 
 ######################################################################################
@@ -327,34 +329,67 @@ def betterEvaluationFunction(currentGameState):
 		Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
 		evaluation function (problem 4).
 
-		DESCRIPTION: <write something here so we know what you did>
+		The metrics I use to improve Pacman's performance are computing distance to
+		the nearest food (and inverting that quantity) as well as computing the
+		most food in a particular direction. I had hoped that it would cause pacman
+		to jitter less (further I wish I had access to pacman's previous moves overall)
+		but it seemed to have carried on regardless. The heuristic created helps pacman
+		win most of the time (again both being algorithms that produce quantities related
+		to distance to food) and is hopefully performant enough for extra credit!
 	"""
 
 	# BEGIN_YOUR_CODE (around 30 lines of code expected)
 	# Useful information you can extract from a GameState (pacman.py)
 	"""
-		One idea for playing the game of pacman (as I see it) is to
-		create a quantity I'm affectionately referring to as momentum.
-		In general, when playing the game, I continue in a direction
-		unless acted on by another force (hit wall, ghost coming for
-		attack). That said, one of the best ways to clear the board
-		is to just continue in a direction until acted upon
-		by some agent or boundary.
 	"""
 	walls = currentGameState.getWalls()
 	width = walls.width
 	height = walls.height
+	dirToIndex = {"North": 1, "South": 1, "East": 0, "West": 0}
+	dirToIncrement = {"North": 1, "South": -1, "East": 1, "West": -1}
+	dirToInverse = {"North": "South", "South": "North", "East": "West", "West": "East"}
 	def distanceToFood(pos):
+		# Compute the distance to the closest food
 		distance = float('inf')
+		foodLeft = False
 		for x in range(width):
 			for y in range(height):
 				if currentGameState.hasFood(x, y):
+					foodLeft = True
 					md = manhattanDistance((x,y), pos)
 					if md < distance:
 						distance = md
+		distance = distance if foodLeft else 0.01
 		return distance
+	
+	def follow(pos, direction):
+		posCopy = list(pos)
+		dirIndex = dirToIndex[direction]
+		foodCount = 0
+		posCopy[dirIndex] += dirToIncrement[direction]
+		while not currentGameState.hasWall(posCopy[0], posCopy[1]) and\
+				currentGameState.hasFood(posCopy[0], posCopy[1]) and\
+				( (dirIndex == 0 and posCopy[dirIndex] < width and posCopy[dirIndex] > 0) or\
+						(dirIndex == 1 and posCopy[dirIndex] < height and posCopy[dirIndex] > 0) ):
+			foodCount += 1
+			posCopy[dirIndex] += dirToIncrement[direction]
+		return foodCount
+
+	def foodInDirection(pos, direction):
+		posCopy = list(pos)
+		dirIndex = dirToIndex[direction]
+		posCopy[dirIndex] += dirToIncrement[direction]
+		return currentGameState.hasFood(posCopy[0], posCopy[1])
+
+	def foodBehind(pos, direction):
+		posCopy = list(pos)
+		behind = dirToInverse[direction]
+		dirIndex = dirToIndex[behind]
+		posCopy[dirIndex] += dirToIncrement[behind]
+		return currentGameState.hasFood(posCopy[0], posCopy[1])
 
 	def getFoodInDirection(pos, direction):
+		# Find the direction with the best food prospects
 		start = [pos[0], pos[1]]
 		end = [0, 0]
 		if direction is "North":
@@ -382,54 +417,35 @@ def betterEvaluationFunction(currentGameState):
 		# Returns the percentage of food in a given direction
 		return count/(totalFood * 1.0)
 
-	def flattenAndBias(pos, direction):
-		foodArr = currentGameState.getFood()
-		if direction == "East" or direction == "West":
-			colSums = [0] * width
-			for x in range(width):
-				for y in range(height):
-					if foodArr[x][y]:
-						colSums[x] += 1
-			westSum = sum(colSums[0:pos[0]])
-			eastSum = sum(colSums[pos[0]:width])
-			if westSum > eastSum and direction == "West":
-				return 200
-			if westSum < eastSum and direction == "East":
-				return 200
-			return -200
-		if direction == "North" or direction == "South":
-			rowSums = [0] * height
-			for y in range(height):
-				for x in range(width):
-					if foodArr[x][y]:
-						rowSums[y] += 1
-			northSum = sum(rowSums[pos[1]:height])
-			southSum = sum(rowSums[0:pos[1]])
-			if northSum > southSum and direction == "North":
-				return 200
-			if northSum < southSum and direction == "South":
-				return 200
-			return -200
-
 	# Current pacman state
 	pacmanState = currentGameState.getPacmanState()
 	pacmanCurrPos = pacmanState.getPosition()
 	pacmanCurrDir = pacmanState.getDirection()
 	score = currentGameState.getScore()
-	foodDirScore = getFoodInDirection(pacmanCurrPos, pacmanCurrDir)
-	foodDirScore *= 0.3 * 20
-	#fab = flattenAndBias(pacmanCurrPos, pacmanCurrDir)
+	#foodDirScore = getFoodInDirection(pacmanCurrPos, pacmanCurrDir)
+	#foodDirScore *= 0.3 * abs(score)
+	#foodDirScore = 0
+	#fa = foodAround(pacmanCurrPos, pacmanCurrDir)
+	#fb = foodBehind(pacmanCurrPos, pacmanCurrDir)
 	dtf = distanceToFood(pacmanCurrPos)
+	# measure distance to food as a fraction of the overall score.
+	# remember that a losing move is a move just as well and needs
+	# to be regarded highly.
+	#penalty = 1
+	#if fb:
+		#penalty = 1/100
+	fd = follow(pacmanCurrPos, pacmanCurrDir)
+	if fd == 0:
+		fd = 0.1
 	if dtf == 0:
-		dtf = 1
-	dtf *= 1/dtf * 0.6 * 200
-
-	total = dtf + foodDirScore + score 
+		dtf = 0.1
+	dtf *= 1.0
+	dtf = ((1/dtf)**2) * 0.6 * abs(score)
+	total = dtf + score - 1/fd
 
 	return total
 	# END_YOUR_CODE
 
 # Abbreviation
 better = betterEvaluationFunction
-
 
