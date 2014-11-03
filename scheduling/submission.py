@@ -11,7 +11,11 @@ def create_chain_csp(n):
     csp = util.CSP()
     # Problem 0c
     # BEGIN_YOUR_CODE (around 5 lines of code expected)
-    raise Exception("Not implemented yet")
+    for v in range(1, n):
+        csp.add_variable(variables[v], domain)
+    for v in range(1, n-1):
+        csp.add_binary_potential(variables[v], variables[v+1],\
+                lambda x, y: x != y )
     # END_YOUR_CODE
     return csp
 
@@ -32,7 +36,24 @@ def create_nqueens_csp(n = 8):
     csp = util.CSP()
     # Problem 1a
     # BEGIN_YOUR_CODE (around 10 lines of code expected)
-    raise Exception("Not implemented yet")
+    def slope(x1, x2, y1, y2):
+        d = (x2 - x1) * 1.0
+        if d == 0:
+            return 0
+        return (y2 - y1)/d
+    variables = ['x%d'%i for i in range(n)]
+    domain = [c for c in range(n)]
+    for v in range(n):
+        csp.add_variable(variables[v], domain)
+    for r in range(n):
+        for other in range(n):
+            # NOT the same row and column
+            csp.add_binary_potential(variables[r], variables[other],\
+                    lambda x, y: x != y )
+            # NOT the same diagonal (use slope to determine this)
+            csp.add_binary_potential(variables[r], variables[other],\
+                    lambda y1, y2: slope(r, other, y1, y2) != 1.0\
+                    and slope(r, other, y1, y2) != -1.0)
     # END_YOUR_CODE
     return csp
 
