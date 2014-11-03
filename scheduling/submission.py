@@ -11,9 +11,9 @@ def create_chain_csp(n):
     csp = util.CSP()
     # Problem 0c
     # BEGIN_YOUR_CODE (around 5 lines of code expected)
-    for v in range(1, n):
+    for v in range(0, n):
         csp.add_variable(variables[v], domain)
-    for v in range(1, n-1):
+    for v in range(0, n-1):
         csp.add_binary_potential(variables[v], variables[v+1],\
                 lambda x, y: x != y )
     # END_YOUR_CODE
