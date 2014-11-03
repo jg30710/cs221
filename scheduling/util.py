@@ -308,7 +308,7 @@ class Profile:
                 continue
 
             # Request to take something
-            m = re.match('request (\w+)(.*)', line)
+            m = re.match('request ([\w&]+)(.*)', line)
             if m:
                 cids = [self.ensure_course_id(m.group(1))]
                 quarters = []
