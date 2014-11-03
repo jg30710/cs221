@@ -262,7 +262,18 @@ class BacktrackingSearch():
             # Hint: remember to use indices: for var_idx in range(len(assignment)): ...
             # Hint: given var_idx, self.domains[var_idx] gives you all the possible values
             # BEGIN_YOUR_CODE (around 10 lines of code expected)
-            raise Exception("Not implemented yet")
+            numAssign = len(assignment)
+            varList = []
+            for var in xrange(numAssign):
+                if assignment[var] is None:
+                    domain = self.domains[var]
+                    aCount = 0
+                    for val in domain:
+                        delta = self.get_delta_weight(assignment, var, val)
+                        if delta > 0:
+                            aCount += 1
+                    varList.append( (aCount, var) )
+            return min(varList)[1]
             # END_YOUR_CODE
 
 
