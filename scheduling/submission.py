@@ -305,12 +305,17 @@ class BacktrackingSearch():
             d_i = self.domains[x_i]
             d_j = self.domains[x_j]
             changed = False
+            # The algorithm presented in class was actually somewhat different
+            # (and missing the definition) from the one I found in the notes.
+            # We ONLY remove a domain item i iff there are NO binary
+            # or unary constraints satisfied for all j
             for i in list(d_i):
                 remove = True
                 for j in list(d_j):
                     if bp and bp[x_j] and bp[x_j][x_i] and bp[x_j][x_i][j]:
                         if bp[x_j][x_i][j][i] != 0:
                             remove = False
+                    # TODO: find a good way to test this
                     if up and up[x_i]:
                         if up[x_i][i] != 0:
                             remove = False
