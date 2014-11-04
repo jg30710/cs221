@@ -543,7 +543,10 @@ class SchedulingCSPConstructor():
         """
         # Problem 3a
         # BEGIN_YOUR_CODE (around 5 lines of code expected)
-        raise Exception("Not implemented yet")
+        for req in self.profile.requests:
+            for quarter in self.profile.quarters:
+                csp.add_unary_potential((req, quarter), lambda cid: cid is None\
+                        or quarter in req.quarters)
         # END_YOUR_CODE
 
     def add_request_weights(self, csp):
