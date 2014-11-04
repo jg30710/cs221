@@ -298,7 +298,29 @@ class BacktrackingSearch():
         #   (self.csp.binaryPotentials[var1][var2] returns a nested dict of all assignments)
 
         # BEGIN_YOUR_CODE (around 20 lines of code expected)
-        raise Exception("Not implemented yet")
+        queue = collections.deque([ (var, list(self.domains[var])) ])
+        up = self.csp.unaryPotentials
+        bp = self.csp.binaryPotentials
+        while queue:
+            x_j, domain = queue.popleft()
+            neighbors = self.csp.get_neighbor_vars(x_j)
+            #print "X_j", x_j, "domains", self.domains[x_j]
+            if domain:
+                val1 = domain[0]
+                for neighbor in neighbors:
+                    neighborDomainsCopy = list(self.domains[neighbor])
+                    for val2 in neighborDomainsCopy:
+                        # Enforce arc consistency
+                        if up and up[neighbor]:
+                            if up[neighbor][val2] == 0:
+                                # Inconsistent!
+                                self.domains[neighbor].remove(val2)
+                                queue.append( (neighbor, list(self.domains[neighbor])) )
+                        if bp and bp[x_j] and bp[x_j][neighbor] and bp[x_j][neighbor][val1]:
+                            if bp[x_j][neighbor][val1][val2] == 0:
+                                self.domains[neighbor].remove(val2)
+                                queue.append( (neighbor, list(self.domains[neighbor])) )
+            else: break
         # END_YOUR_CODE
 
 
