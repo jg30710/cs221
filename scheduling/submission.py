@@ -433,7 +433,28 @@ def get_sum_variable(csp, name, variables, maxSum):
     """
     # Problem 2b
     # BEGIN_YOUR_CODE (around 20 lines of code expected)
-    raise Exception("Not implemented yet")
+    result = ('sum', name, 'aggregated')
+    csp.add_variable(result, range(maxSum + 1))
+    if len(variables) == 0:
+        csp.add_unary_potential(result, lambda val: not val)
+        return result
+
+    domain = [(i, j) for i in range(maxSum + 1) for j in range(i, maxSum + 1)]
+    def potential(a, x):
+        return (a[0] + x) == a[1]
+    def consistency(a_i, a_j):
+        return a_i[1] == a_j[0]
+    for index, var in enumerate(variables):
+        a_i = ('sum', name, index)
+        csp.add_variable(a_i, domain)
+        if index == 0:
+            csp.add_unary_potential(a_i, lambda x: x[0] == 0)
+            csp.add_binary_potential(a_i, var, potential)
+        else:
+            csp.add_binary_potential(('sum', name, index), var, potential)
+            csp.add_binary_potential(('sum', name, index - 1), a_i, consistency)
+    csp.add_binary_potential(a_i, result, lambda x, y: x[1] == y)
+    return result
     # END_YOUR_CODE
 
 
