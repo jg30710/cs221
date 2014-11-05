@@ -329,7 +329,8 @@ class BacktrackingSearch():
         while queue:
             x_j = queue.popleft()
             neighbors = self.csp.get_neighbor_vars(x_j)
-            neighbors.remove(x_j)
+            if x_j in neighbors:
+                neighbors.remove(x_j)
             neighborsAssigned[x_j] = True
             for x_i in neighbors:
                 if enforceArcConsistency(x_i, x_j):
@@ -545,8 +546,9 @@ class SchedulingCSPConstructor():
         # BEGIN_YOUR_CODE (around 5 lines of code expected)
         for req in self.profile.requests:
             for quarter in self.profile.quarters:
-                csp.add_unary_potential((req, quarter), lambda cid: cid is None\
-                        or quarter in req.quarters)
+                if req.quarters != []:
+                    csp.add_unary_potential((req, quarter), lambda cid: cid is None\
+                            or quarter in req.quarters)
         # END_YOUR_CODE
 
     def add_request_weights(self, csp):
