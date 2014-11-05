@@ -1,0 +1,24 @@
+# Unit limit per quarter. You can ignore this for the first
+# few questions in problem 2.
+minUnits 3
+maxUnits 4
+
+# These are the quarters that I need to fill out.
+# It is assumed that the quarters are sorted in chronological order.
+register Win2013
+register Spr2014
+
+# Courses I've already taken
+taken CS106B
+taken CS107
+taken CS109
+taken CS140
+taken CS144
+taken CS145
+taken CS161
+taken CS221
+taken MATH51
+
+# Courses that I'm requesting
+request CS246 in Win2013
+request CS232 or CS244 in Spr2014
