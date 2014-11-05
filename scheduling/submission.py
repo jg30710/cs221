@@ -627,7 +627,29 @@ class SchedulingCSPConstructor():
         #         be enforced by the constraints added by add_quarter_constraints
 
         # BEGIN_YOUR_CODE (around 20 lines of code expected)
-        raise Exception("Not implemented yet")
+        pMin = self.profile.minUnits
+        pMax = self.profile.maxUnits
+        bull = self.bulletin
+        for quarter in self.profile.quarters:
+            coursesThisQuarter = []
+            for req in self.profile.requests:
+                for cid in req.cids:
+                    cMin = bull.courses[cid].minUnits
+                    cMax = bull.courses[cid].maxUnits
+                    cidVar = (cid, quarter)
+                    minMax = range(cMin, cMax + 1)
+                    courseDomain = [0] + minMax
+                    csp.add_variable(cidVar, courseDomain)
+                    # If we're not requesting a class this quarter or the cid isn't
+                    # in this requested quarter we'll require 0 units be used y==0.
+                    # Otherwise y has to fall in the appropriate (non-zero-containing)
+                    # range.
+                    csp.add_binary_potential((req, quarter), cidVar, lambda x, y:\
+                            y == 0 if x is None or cid not in x else y in minMax)
+                    coursesThisQuarter.append(cidVar)
+            name = 'sum-for-quarter-' + quarter
+            sumForQuarter = get_sum_variable(csp, name, coursesThisQuarter, pMax)
+            csp.add_unary_potential(sumForQuarter, lambda n: pMin <= n and n <= pMax)
         # END_YOUR_CODE
 
     def add_all_additional_constraints(self, csp):
