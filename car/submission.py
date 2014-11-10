@@ -39,20 +39,20 @@ class ExactInference(object):
     # - Don't forget to normalize self.belief!
     def observe(self, agentX, agentY, observedDist):
         # BEGIN_YOUR_CODE (around 10 lines of code expected)
-				def euclidean(x1, y1, x2, y2):
-					return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
-				# Compute the pdf off of observed Dist
-				# For every tile in the grid
-				for r in range(self.belief.getNumRows()):
-					for c in range(self.belief.getNumCols()):
-						otherX, otherY = (util.colToX(c), util.rowToY(r))
-						dist = euclidean(agentX, agentY, otherX, otherY)
-						prev = self.belief.getProb(r, c)
-						pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
-						# Update the posterior probability
-						posterior = pdf * prev
-						self.belief.setProb(r, c, posterior)
-				self.belief.normalize()
+        def euclidean(x1, y1, x2, y2):
+            return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
+        # Compute the pdf off of observed Dist
+        # For every tile in the grid
+        for r in range(self.belief.getNumRows()):
+            for c in range(self.belief.getNumCols()):
+                otherX, otherY = (util.colToX(c), util.rowToY(r))
+                dist = euclidean(agentX, agentY, otherX, otherY)
+                prev = self.belief.getProb(r, c)
+                pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
+                # Update the posterior probability
+                posterior = pdf * prev
+                self.belief.setProb(r, c, posterior)
+        self.belief.normalize()
         # END_YOUR_CODE
 
     # Function: Elapse Time (propose a new belief distribution based on a learned transition model)
@@ -63,20 +63,20 @@ class ExactInference(object):
     # - Use self.belief.addProb and self.belief.getProb to manipulate beliefs.
     # - Don't forget to normalize self.belief!
     def elapseTime(self):
-			if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
-			# BEGIN_YOUR_CODE (around 10 lines of code expected)
-			beliefCopy = util.Belief(self.belief.getNumRows(), self.belief.getNumCols(), 0.0)
-			for key, transProb in self.transProb.items():
-				if transProb != 0:
-					oldTile, newTile = key
-					oldR, oldC = oldTile
-					r, c = newTile
-					prevPosterior = self.belief.getProb(oldR, oldC)
-					posterior = prevPosterior * transProb
-					beliefCopy.addProb(r, c, posterior)
-			beliefCopy.normalize()
-			self.belief = beliefCopy
-			# END_YOUR_CODE
+        if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
+        # BEGIN_YOUR_CODE (around 10 lines of code expected)
+        beliefCopy = util.Belief(self.belief.getNumRows(), self.belief.getNumCols(), 0.0)
+        for key, transProb in self.transProb.items():
+            if transProb != 0:
+                oldTile, newTile = key
+                oldR, oldC = oldTile
+                r, c = newTile
+                prevPosterior = self.belief.getProb(oldR, oldC)
+                posterior = prevPosterior * transProb
+                beliefCopy.addProb(r, c, posterior)
+        beliefCopy.normalize()
+        self.belief = beliefCopy
+        # END_YOUR_CODE
       
     # Function: Get Belief
     # ---------------------
@@ -146,28 +146,28 @@ class ParticleFilter(object):
     # - Create |self.NUM_PARTICLES| new particles during resampling.
     # - To pass the grader, you must call util.weightedRandomChoice() once per new particle.
     def observe(self, agentX, agentY, observedDist):
-			# BEGIN_YOUR_CODE (around 15 lines of code expected)
-			def euclidean(x1, y1, x2, y2):
-				return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
-			weights = {}
-			posteriors = {}
-			for tile, occurrences in self.particles.items():
-				weights[tile] = 0
-				r, c = tile 
-				pX, pY = (util.colToX(c), util.rowToY(r))
-				dist = euclidean(agentX, agentY, pX, pY)
-				pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
-				posteriors[tile] = pdf * self.belief.getProb(r, c)
-				weights[tile] = pdf * occurrences
-			newParticles = collections.Counter()
-			for p in range(self.NUM_PARTICLES):
-				tile = util.weightedRandomChoice(weights)
-				newParticles[tile] += 1
-			self.particles = newParticles
-			for tile in self.particles:
-				self.belief.setProb(r, c, posteriors[tile])
-			# END_YOUR_CODE
-			self.updateBelief()
+        # BEGIN_YOUR_CODE (around 15 lines of code expected)
+        def euclidean(x1, y1, x2, y2):
+            return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
+        weights = {}
+        posteriors = {}
+        for tile, occurrences in self.particles.items():
+            weights[tile] = 0
+            r, c = tile 
+            pX, pY = (util.colToX(c), util.rowToY(r))
+            dist = euclidean(agentX, agentY, pX, pY)
+            pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
+            posteriors[tile] = pdf * self.belief.getProb(r, c)
+            weights[tile] = pdf * occurrences
+        newParticles = collections.Counter()
+        for p in range(self.NUM_PARTICLES):
+            tile = util.weightedRandomChoice(weights)
+            newParticles[tile] += 1
+        self.particles = newParticles
+        for tile in self.particles:
+            self.belief.setProb(r, c, posteriors[tile])
+        # END_YOUR_CODE
+        self.updateBelief()
 
     # Function: Elapse Time (propose a new belief distribution based on a learned transition model)
     # ---------------------
@@ -182,19 +182,19 @@ class ParticleFilter(object):
     #   and call util.weightedRandomChoice() once per particle on the tile.
     def elapseTime(self):
         # BEGIN_YOUR_CODE (around 10 lines of code expected)
-				particlesCopy = collections.Counter(self.particles)
-				weights = {}
-				for tile in self.particles:
-					transitionTiles = util.weightedRandomChoice(self.transProbDict)
-					transProb = self.transProbDict[transitionTiles]
-					oldTile, newTile = transitionTiles
-					weights[newTile] = transProb
-				newParticles = collections.Counter()
-				for tile in self.particles:
-					newTile = util.weightedRandomChoice(weights)
-					newParticles[newTile] += 1
-				print newParticles
-				self.particles = newParticles
+        particlesCopy = collections.Counter(self.particles)
+        weights = {}
+        for tile in self.particles:
+            transitionTiles = util.weightedRandomChoice(self.transProbDict)
+            transProb = self.transProbDict[transitionTiles]
+            oldTile, newTile = transitionTiles
+            weights[newTile] = transProb
+        newParticles = collections.Counter()
+        for tile in self.particles:
+            newTile = util.weightedRandomChoice(weights)
+            newParticles[newTile] += 1
+        print newParticles
+        self.particles = newParticles
         # END_YOUR_CODE
         
     # Function: Get Belief
