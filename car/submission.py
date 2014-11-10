@@ -39,7 +39,20 @@ class ExactInference(object):
     # - Don't forget to normalize self.belief!
     def observe(self, agentX, agentY, observedDist):
         # BEGIN_YOUR_CODE (around 10 lines of code expected)
-        raise Exception("Not implemented yet")
+				def euclidean(x1, y1, x2, y2):
+					return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
+				# Compute the pdf off of observed Dist
+				# For every tile in the grid
+				for r in range(self.belief.getNumRows()):
+					for c in range(self.belief.getNumCols()):
+						otherX, otherY = (util.colToX(c), util.rowToY(r))
+						dist = euclidean(agentX, agentY, otherX, otherY)
+						prev = self.belief.getProb(r, c)
+						pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
+						# Update the posterior probability
+						posterior = pdf * prev
+						self.belief.setProb(r, c, posterior)
+				self.belief.normalize()
         # END_YOUR_CODE
 
     # Function: Elapse Time (propose a new belief distribution based on a learned transition model)
