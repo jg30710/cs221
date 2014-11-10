@@ -63,10 +63,20 @@ class ExactInference(object):
     # - Use self.belief.addProb and self.belief.getProb to manipulate beliefs.
     # - Don't forget to normalize self.belief!
     def elapseTime(self):
-        if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
-        # BEGIN_YOUR_CODE (around 10 lines of code expected)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+			if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
+			# BEGIN_YOUR_CODE (around 10 lines of code expected)
+			beliefCopy = util.Belief(self.belief.getNumRows(), self.belief.getNumCols(), 0.0)
+			for key, transProb in self.transProb.items():
+				if transProb != 0:
+					oldTile, newTile = key
+					oldR, oldC = oldTile
+					r, c = newTile
+					prevPosterior = self.belief.getProb(oldR, oldC)
+					posterior = prevPosterior * transProb
+					beliefCopy.addProb(r, c, posterior)
+			beliefCopy.normalize()
+			self.belief = beliefCopy
+			# END_YOUR_CODE
       
     # Function: Get Belief
     # ---------------------
