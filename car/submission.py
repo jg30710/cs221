@@ -150,22 +150,18 @@ class ParticleFilter(object):
         def euclidean(x1, y1, x2, y2):
             return math.sqrt((y2 - y1)**2 + (x2 - x1)**2)
         weights = {}
-        posteriors = {}
         for tile, occurrences in self.particles.items():
             weights[tile] = 0
             r, c = tile 
             pX, pY = (util.colToX(c), util.rowToY(r))
             dist = euclidean(agentX, agentY, pX, pY)
             pdf = util.pdf(observedDist, Const.SONAR_STD, dist)
-            posteriors[tile] = pdf * self.belief.getProb(r, c)
             weights[tile] = pdf * occurrences
         newParticles = collections.Counter()
         for p in range(self.NUM_PARTICLES):
             tile = util.weightedRandomChoice(weights)
             newParticles[tile] += 1
         self.particles = newParticles
-        for tile in self.particles:
-            self.belief.setProb(r, c, posteriors[tile])
         # END_YOUR_CODE
         self.updateBelief()
 
@@ -182,18 +178,12 @@ class ParticleFilter(object):
     #   and call util.weightedRandomChoice() once per particle on the tile.
     def elapseTime(self):
         # BEGIN_YOUR_CODE (around 10 lines of code expected)
-        particlesCopy = collections.Counter(self.particles)
-        weights = {}
-        for tile in self.particles:
-            transitionTiles = util.weightedRandomChoice(self.transProbDict)
-            transProb = self.transProbDict[transitionTiles]
-            oldTile, newTile = transitionTiles
-            weights[newTile] = transProb
         newParticles = collections.Counter()
-        for tile in self.particles:
-            newTile = util.weightedRandomChoice(weights)
-            newParticles[newTile] += 1
-        print newParticles
+        for tile, occurrences in self.particles.items():
+            weights = self.transProbDict[tile]
+            for occurrence in range(occurrences):
+                newTile = util.weightedRandomChoice(weights)
+                newParticles[newTile] += 1
         self.particles = newParticles
         # END_YOUR_CODE
         
