@@ -92,7 +92,38 @@ that all of this is my own work.
 \section*{Problem 5}
 
 \begin{enumerate}[label=(\alph*)]
-	\item Stuff
+	\item The expression for the conditional distribution for \(p(c_{11}, c_{12} | e_1)\)
+		for \(K=2\) and \(T=1\) is given by:
+		\begin{multline*}
+			p(c_{11}, c_{12} | e_1) \propto p(c_{11}, c_{12})(
+				p_{\mathcal{N}} (e_{11}; \lVert a_1 - c_{11} \rVert; \sigma^2)
+				p_{\mathcal{N}} (e_{12}; \lVert a_1 - c_{12} \rVert; \sigma^2) + \\
+				p_{\mathcal{N}} (e_{11}; \lVert a_1 - c_{12} \rVert; \sigma^2)
+				p_{\mathcal{N}} (e_{12}; \lVert a_1 - c_{11} \rVert; \sigma^2)
+			)
+		\end{multline*}
+		Basically, the Gaussian is computed for each permutation (assigning each car
+		a value from \(e_1\) and then computing the Gaussian) and summed over
+		the evidence we've seen.
+
+	\item To show that the number of car locations that achieve the maximum
+		\(p(c_{11},..., c_{1K} | e_1)\) is at least \(K!\), we must first make the
+		assumption that no two cars can occupy the same position and this probability
+		is highest when the other cars are closest.
+
+		If we then consider the one dimensional case where cars are positioned at discrete points
+		on a line say, we know that, if our car was at the origin, the simplest, closest
+		(max) positioning would be to have the cars arranged immediately around ours. For
+		example, if there are \(K=2\) cars and ours was at the origin, the optimum
+		arrangement would be to place one at \(-1\) and the other at \(+1\). Since, a priori,
+		we don't know which car as at which point, we now have \(K!\) possible permutations
+		of car arrangements that maximize \(p(c_{11},..., c_{1K} | e_1)\).
+
+		Finally, reconsidering that we have shown that there are at most \(K!\) optimal
+		arrangements in one dimension, expanding to two or higher would mean that
+		this value is a minimum (since you can now make the same arrangement about the \(y\)
+		axis for instance).
+
 \end{enumerate}
 
 \end{document}
