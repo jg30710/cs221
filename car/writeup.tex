@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\title{Homework 7}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 7}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 1}
+
+\begin{enumerate}[label=(\alph*)]
+	\item The posterior distribution can be expressed with the following formula:
+
+		\[
+			p(c_1 = 1 | d_1 = 0) = p(c_1 = 1) \cdot p(d_1 = 0 | c_1 = 1)
+		\]
+
+		The probability distribution contained in \(p(c_1 = 1)\) is dependent
+		on the value of \(c_0\). The distribution for the posterior is
+		represented by the following table:
+
+		\begin{tabular}{| l | l |}
+			\hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0\) & \(0.5 \epsilon \eta\)\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0\) & \(0.5 (1-\epsilon) \eta\)\\ \hline
+		\end{tabular}
+
+	\item Given that we now know that \(d_2 = 1\), the posterior becomes:
+
+		\[
+			p(c_1 = 1 | d_1 = 0, d_2 = 1) = p(c_1 = 1)
+				\cdot p(d_1 = 0, d_2 = 1 | c_1 = 1)
+		\]
+
+		Much akin to the previous case, we now compute the distribution, only
+		this time introducing one more unknown, so to speak, in the form
+		of the value of \(c_2\) since \(d_2\) depends on it:
+
+		\begin{tabular}{| l | l |}
+			\hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0, c_2 = 0\) &
+				\(0.5 \epsilon \eta \epsilon\)\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0, c_2 = 0\) &
+				\(0.5 (1-\epsilon) \eta \epsilon\)\\ \hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0, c_2 = 1\) &
+				\(0.5 \epsilon \eta (1-\epsilon)\)\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0, c_2 = 1\) &
+				\(0.5 (1-\epsilon) \eta (1-\epsilon)\)\\ \hline
+		\end{tabular}
+
+	\item Finally, knowing that \(\epsilon = 0.1\) and \(\eta = 0.2\) using the 
+		previous tables, we can compute the posterior distribution. The
+		tables are now:
+
+		\begin{tabular}{| l | l | l |}
+			\hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0\) & \(0.5 \epsilon \eta\) & 0.01\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0\) & \(0.5 (1-\epsilon) \eta\) & 0.09\\ \hline
+		\end{tabular}
+
+		\begin{tabular}{| l | l | l |}
+			\hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0, c_2 = 0\) &
+				\(0.5 \epsilon \eta \epsilon\) & 0.001\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0, c_2 = 0\) &
+			   \(0.5 (1-\epsilon) \eta \epsilon\) & 0.009\\ \hline
+			\(c_0 = 0, c_1 = 1, d_1 = 0, c_2 = 1\) &
+			   \(0.5 \epsilon \eta (1-\epsilon)\) & 0.009\\ \hline
+			\(c_0 = 1, c_1 = 1, d_1 = 0, c_2 = 1\) &
+			   \(0.5 (1-\epsilon) \eta (1-\epsilon)\) & 0.081\\ \hline
+		\end{tabular}
+
+		Totaling the values yields both the posteriors being \(0.1\).
+		My intuition was that, by knowing future sensor readings, the
+		strange \(c_1 = 1\) and \(d_1 = 0\) readings would be reconciled
+		because the next reading of \(d_2 = 1\) would reaffirm that
+		the car was previously at \(c_1\) despite the reading at \(d_1\).
+
+\end{enumerate}
+
+\section*{Problem 5}
+
+\begin{enumerate}[label=(\alph*)]
+	\item Stuff
+\end{enumerate}
+
+\end{document}
