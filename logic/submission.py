@@ -82,16 +82,20 @@ def formula2d():
     def Grandmother(x, y): return Atom('Grandmother', x, y)  # whether x has a grandmother y
     # BEGIN_YOUR_CODE (around 5 lines of code expected)
     return Forall('$x',
-                Forall('$y',
-                    Forall('$z',
-                        Equiv(Grandmother('$x', '$z'),
-                            AndList([
-                                Female('$z'),
-                                Parent('$x', '$y'), Parent('$y', '$z')
-                            ])
-                        )
-                    )
-                )
+								Forall('$z',
+										Equiv(
+												Grandmother('$x', '$z'),
+												AndList([
+													Female('$z'),
+													Exists('$y',
+														And(
+															Parent('$x', '$y'),
+															Parent('$y', '$z')
+														)
+													)
+												])
+										)
+								)
             )
     # END_YOUR_CODE
 
@@ -124,7 +128,7 @@ def liar():
     # You should add 5 formulas, one for each of facts 1-5.
     # BEGIN_YOUR_CODE (around 15 lines of code expected)
     formulas.append(Equiv(TellTruth(susan), CrashedServer(nicole)))
-    formulas.append(Equiv(TellTruth(mark), And(CrashedServer(susan), Not(CrashedServer(nicole)) ))) # hmmm...
+    formulas.append(Equiv(TellTruth(mark), CrashedServer(susan)))
     formulas.append(Equiv(TellTruth(nicole), Not(TellTruth(susan))))
     truth = Exists('$x', And(TellTruth('$x'), Forall('$y', Implies(TellTruth('$y'), Equals('$y', '$x')) )))
     crashed = Exists('$x', And(CrashedServer('$x'), Forall('$y', Implies(CrashedServer('$y'), Equals('$y', '$x')) )))
@@ -162,12 +166,14 @@ def ints():
     query = None
     # BEGIN_YOUR_CODE (around 25 lines of code expected)
     uniqueSuccessor = Forall('$x', Exists('$y',
-            AndList([
-                Successor('$x', '$y'),
-                Not(Equals('$x', '$y')),
+            Implies(
+								And(
+									Successor('$x', '$y'),
+									Not(Equals('$x', '$y'))
+								),
                 # Ensure unique successor
                 Not(Exists('$z', AndList([Equals('$y', '$z'), Not(Equals('$x', '$z')), Successor('$x', '$z')])))
-            ])
+            )
     ))
     evenOrOdd = Forall('$x', Equiv(Even('$x'), Not(Odd('$x'))))
     succEven = Forall('$x', Forall('$y', Implies(And(Even('$x'), Successor('$x', '$y')), Odd('$y'))))
