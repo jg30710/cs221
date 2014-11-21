@@ -84,14 +84,15 @@ def formula2d():
     return Forall('$x',
                 Forall('$y',
                     Forall('$z',
-                    Equiv(Grandmother('$x', '$z'),
-                        AndList([
-                            Female('$z'), Not(Parent('$x', '$z')), Parent('$x', '$y'), Parent('$y', '$z')
-                        ])
+                        Equiv(Grandmother('$x', '$z'),
+                            AndList([
+                                Female('$z'),
+                                Parent('$x', '$y'), Parent('$y', '$z')
+                            ])
+                        )
                     )
                 )
             )
-        )
     # END_YOUR_CODE
 
 ############################################################
@@ -122,7 +123,13 @@ def liar():
     formulas.append(Equiv(TellTruth(john), Not(CrashedServer(john))))
     # You should add 5 formulas, one for each of facts 1-5.
     # BEGIN_YOUR_CODE (around 15 lines of code expected)
-    raise Exception("Not implemented yet")
+    formulas.append(Equiv(TellTruth(susan), CrashedServer(nicole)))
+    formulas.append(Equiv(TellTruth(mark), And(CrashedServer(susan), Not(CrashedServer(nicole)) ))) # hmmm...
+    formulas.append(Equiv(TellTruth(nicole), Not(TellTruth(susan))))
+    truth = Exists('$x', And(TellTruth('$x'), Forall('$y', Implies(TellTruth('$y'), Equals('$y', '$x')) )))
+    crashed = Exists('$x', And(CrashedServer('$x'), Forall('$y', Implies(CrashedServer('$y'), Equals('$y', '$x')) )))
+    formulas.append(truth)
+    formulas.append(crashed)
     # END_YOUR_CODE
     query = CrashedServer('$x')
     return (formulas, query)
