@@ -161,7 +161,32 @@ def ints():
     formulas = []
     query = None
     # BEGIN_YOUR_CODE (around 25 lines of code expected)
-    raise Exception("Not implemented yet")
+    uniqueSuccessor = Forall('$x', Exists('$y',
+            AndList([
+                Successor('$x', '$y'),
+                Not(Equals('$x', '$y')),
+                # Ensure unique successor
+                Not(Exists('$z', AndList([Equals('$y', '$z'), Not(Equals('$x', '$z')), Successor('$x', '$z')])))
+            ])
+    ))
+    evenOrOdd = Forall('$x', Equiv(Even('$x'), Not(Odd('$x'))))
+    succEven = Forall('$x', Forall('$y', Implies(And(Even('$x'), Successor('$x', '$y')), Odd('$y'))))
+    succOdd = Forall('$x', Forall('$y', Implies(And(Odd('$x'), Successor('$x', '$y')), Even('$y'))))
+    succLarger = Forall('$x', Forall('$y', Implies(Successor('$x', '$y'), Larger('$y', '$x'))))
+    transitive = Forall('$x',
+                    Forall('$y',
+                        Forall('$z',
+                            Implies(And(Larger('$x', '$y'), Larger('$y', '$z')),
+                                Larger('$x', '$z'))
+                            )
+                        )
+                    )
+    formulas.append(uniqueSuccessor)
+    formulas.append(evenOrOdd)
+    formulas.append(succEven)
+    formulas.append(succOdd)
+    formulas.append(succLarger)
+    formulas.append(transitive)
     # END_YOUR_CODE
     # For part (b), your job is to show that adding the following formula
     # would result in a contradiction for finite domains.
