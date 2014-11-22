@@ -166,14 +166,19 @@ def ints():
     query = None
     # BEGIN_YOUR_CODE (around 25 lines of code expected)
     uniqueSuccessor = Forall('$x', Exists('$y',
-            Implies(
-								And(
-									Successor('$x', '$y'),
-									Not(Equals('$x', '$y'))
-								),
-                # Ensure unique successor
-                Not(Exists('$z', AndList([Equals('$y', '$z'), Not(Equals('$x', '$z')), Successor('$x', '$z')])))
+        AndList([
+            Successor('$x', '$y'),
+            Not(Equals('$x', '$y')),
+            Forall('$z',
+                Equiv(
+                    And(
+                        Successor('$x', '$z'),
+                        Not(Equals('$x', '$z'))
+                    ),
+                    Equals('$y', '$z')
+                )
             )
+        ])
     ))
     evenOrOdd = Forall('$x', Equiv(Even('$x'), Not(Odd('$x'))))
     succEven = Forall('$x', Forall('$y', Implies(And(Even('$x'), Successor('$x', '$y')), Odd('$y'))))
