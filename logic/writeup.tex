@@ -1,0 +1,75 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx}
+\title{Homework 8}
+
+\begin{document}
+
+\begin{center}
+{\Large CS221 Fall 2014 Homework 8}
+
+\begin{tabular}{rl}
+SUNet ID: & thomasme \\
+Name: & Thomas Mendoza \\
+Collaborators: & Steven Samson
+\end{tabular}
+\end{center}
+
+By turning in this assignment, I agree by the Stanford honor code and declare
+that all of this is my own work.
+
+\section*{Problem 4}
+
+\begin{enumerate}[label=(\alph*)]
+	\item First to convert the KB to CNF:
+		\[
+			KB = \{(A \lor B) \to C, A\}
+		\]
+		\[
+			KB = \{\lnot(A \lor B) \lor C, A\}
+		\]
+		\[
+			KB = \{(\lnot A \lor \lnot B) \lor C, A\}
+		\]
+		\[
+			KB = \{(\lnot A \lor C) \land (\lnot B \lor C), A\}
+		\]
+
+	\item Reduce the KB to CNF
+		\[
+			KB = \{A \lor B, B \to C, (A \lor C) \to D\}
+		\]
+		\[
+			KB = \{A \lor B, \lnot B \lor C, \lnot (A \lor C) \lor D\}
+		\]
+		\[
+			KB = \{A \lor B, \lnot B \lor C, (\lnot A \land \lnot C) \lor D\}
+		\]
+		\[
+			KB = \{A \lor B, \lnot B \lor C, (\lnot A \lor D) \land (\lnot C \lor D)\}
+		\]
+		\[
+			KB = \{A \lor B, \lnot B \lor C, (\lnot A \lor D), (\lnot C \lor D)\}
+		\]
+
+		Now we apply resolution until we converge to \(D\):
+		\[
+			KB = \{A \lor C, (\lnot A \lor D), (\lnot C \lor D)\}
+		\]
+		\[
+			KB = \{A \lor D, (\lnot A \lor D)\}
+		\]
+		\[
+			KB = \{D\}
+		\]
+
+
+\end{enumerate}
+
+\section*{Problem 5}
+
+\begin{enumerate}[label=(\alph*)]
+	\item The
+
+\end{enumerate}
+
+\end{document}
