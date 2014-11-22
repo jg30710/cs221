@@ -33,6 +33,17 @@ that all of this is my own work.
 		\[
 			KB = \{(\lnot A \lor C) \land (\lnot B \lor C), A\}
 		\]
+		Converting items of the form \(\lnot P \lor Q\) to \(P \to Q\):
+		\[
+			KB = \{(A \to C) \land (B \to C), A\}
+		\]
+		Using the fact that conjuction in the KB can be expressed as separate
+		entities in the KB:
+		\[
+			KB = \{(A \to C), (B \to C), A\}
+		\]
+		Running modus ponens, knowing \(A\) and \(A \to C\) we are able to derive
+		\(C\) and the algorithm converges.
 
 	\item Reduce the KB to CNF
 		\[
@@ -68,8 +79,13 @@ that all of this is my own work.
 \section*{Problem 5}
 
 \begin{enumerate}[label=(\alph*)]
-	\item The
+	\item The reason that adding the constraint "A number is not larger than itself" has no finite
+		model that will be consistent is that in order to test its validity, all values, \(x\), must
+		be considered and that process maps \(x\) to the natural numbers (which are countably infinite
+		and not able to be represented by a finite model).
 
+		In other words, testing a subset of the natural numbers is insufficient for asserting validity
+		of the constraint and must therefore return false unless all natural numbers have been considered.
 \end{enumerate}
 
 \end{document}
